@@ -33,8 +33,7 @@ class LectForm(forms.ModelForm):
         lect.lect_chief = kwargs["lect_chief"]
         lect.lect_type = self.cleaned_data.get("lect_type")
         lect.lect_state = self.cleaned_data.get("lect_state")
-        if self.cleaned_data.get("lect_limit_num") is None:
-            lect.lect_limit_num = 999
+
         lect.save()
         return lect
 
@@ -58,6 +57,12 @@ class LectForm(forms.ModelForm):
             return MethodInfo.objects.get(pk=lect_method)
 
         return None
+
+    def clean_lect_limit_num(self):
+        limit_num = self.cleaned_data.get("lect_limit_num")
+        if limit_num is None:
+            return 999
+        return limit_num
 
 
 class LectPicForm(forms.ModelForm):
