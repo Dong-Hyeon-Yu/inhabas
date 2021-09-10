@@ -46,6 +46,7 @@ class LectForm(forms.ModelForm):
             lect.lect_deadline = self.cleaned_data.get("lect_deadline")
             lect.lect_method = self.cleaned_data.get("lect_method")
             lect.lect_curri = self.cleaned_data.get("lect_curri")
+            lect.lect_limit_num = self.cleaned_data.get("lect_limit_num")
             lect.lect_place_or_link = self.cleaned_data.get("lect_place_or_link")
             lect.save()
             return lect
