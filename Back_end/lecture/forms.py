@@ -52,11 +52,12 @@ class LectForm(forms.ModelForm):
             return lect
         return lect
 
-    def clean(self):
-        cleaned_data = super().clean()
-        if cleaned_data.get("lect_method") is not None:
-            cleaned_data["lect_method"] = MethodInfo.objects.get(pk=cleaned_data["lect_method"])
-        return cleaned_data
+    def clean_lect_method(self):
+        lect_method = self.cleaned_data.get("lect_method")
+        if lect_method is not None:
+            return MethodInfo.objects.get(pk=lect_method)
+
+        return None
 
 
 class LectPicForm(forms.ModelForm):
