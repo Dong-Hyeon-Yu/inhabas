@@ -21,7 +21,7 @@ class LectForm(forms.ModelForm):
             "lect_method": forms.Select(),
             "lect_place_or_link": forms.TextInput(attrs={"placeholder": "강의 방식을 먼저 선택하세요.", "disabled": "disabled"}),
             "lect_deadline": forms.DateTimeInput(),
-            "lect_limit_num": forms.NumberInput(attrs={"placeholder": "강의 최대 수강인원수를 작성하세요. 미 작성시 무한정 수강 가능하도록 설정됩니다."}),
+            "lect_limit_num": forms.NumberInput(attrs={"placeholder": "강의 최대 수강인원수를 작성하세요."}),
             "lect_reject_reason": forms.TextInput(attrs={"placeholder": "거절 사유를 입력해주세요."}),
             "lect_type": forms.HiddenInput(),
             "lect_state": forms.HiddenInput(),
@@ -33,8 +33,7 @@ class LectForm(forms.ModelForm):
         lect.lect_chief = kwargs["lect_chief"]
         lect.lect_type = self.cleaned_data.get("lect_type")
         lect.lect_state = self.cleaned_data.get("lect_state")
-        if self.cleaned_data.get("lect_limit_num") is None:
-            lect.lect_limit_num = 999
+
         lect.save()
         return lect
 
@@ -46,16 +45,24 @@ class LectForm(forms.ModelForm):
             lect.lect_deadline = self.cleaned_data.get("lect_deadline")
             lect.lect_method = self.cleaned_data.get("lect_method")
             lect.lect_curri = self.cleaned_data.get("lect_curri")
+            lect.lect_limit_num = self.cleaned_data.get("lect_limit_num")
             lect.lect_place_or_link = self.cleaned_data.get("lect_place_or_link")
             lect.save()
             return lect
         return lect
 
-    def clean(self):
-        cleaned_data = super().clean()
-        if cleaned_data.get("lect_method") is not None:
-            cleaned_data["lect_method"] = MethodInfo.objects.get(pk=cleaned_data["lect_method"])
-        return cleaned_data
+    def clean_lect_method(self):
+        lect_method = self.cleaned_data.get("lect_method")
+        if lect_method is not None:
+            return MethodInfo.objects.get(pk=lect_method)
+
+        return None
+
+    def clean_lect_limit_num(self):
+        limit_num = self.cleaned_data.get("lect_limit_num")
+        if limit_num is None:
+            return 999
+        return limit_num
 
 
 class LectPicForm(forms.ModelForm):
