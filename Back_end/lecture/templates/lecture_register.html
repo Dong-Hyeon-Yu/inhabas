@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+{% block content %}
+    {% load custom_tags %}
+    <link rel="stylesheet" href="{% static 'css/posting_register.css' %}"/>
+    <script src="{% static 'js/checkbox.js' %}"></script>
+    <script src="{% static 'js/validation_check.js' %}"></script>
+    <script>
+        onload = function () {
+            const obj = document.getElementById("lect_method")
+
+            obj.onchange = function () {
+                const method_name = document.getElementById("method_name");
+                const pol_input_obj = document.getElementById("lect_place_or_link");
+                if (obj.selectedIndex === 1) {
+                    method_name.innerHTML = "장소";
+                    pol_input_obj.placeholder = "강의 장소를 입력해주세요.";
+                    pol_input_obj.disabled = "";
+                } else if (obj.selectedIndex === 2) {
+                    method_name.innerHTML = "Zoom 개인 링크";
+                    pol_input_obj.placeholder = "Zoom 개인 링크를 입력해주세요.";
+                    pol_input_obj.disabled = "";
+                } else if (obj.selectedIndex === 3) {
+                    method_name.innerHTML = "Youtube 개인 채널 링크";
+                    pol_input_obj.placeholder = "Youtube 개인 채널 링크를 입력해주세요";
+                    pol_input_obj.disabled = "";
+                } else if (obj.selectedIndex === 4) {
+                    method_name.innerHTML = "기타";
+                    pol_input_obj.placeholder = "이 외의 형식을 적어주세요.";
+                    pol_input_obj.disabled = "";
+                } else {
+                    method_name.innerHTML = "장소"
+                    pol_input_obj.placeholder = "강의 방식을 먼저 선택하세요."
+                    pol_input_obj.disabled = "disabled";
+                }
+            }
+        }
+    </script>
+    <div class="page-wraper">
+        <div class="page-content bg-white">
+            <!----------상단 제목부분----------->
+            <!--제목을 감싸는 배경-->
+            <div class="dlab-bnr-inr dlab-bnr-inr-sm overlay-black-middle"
+                 style=" background-image: url('{% static 'images/board_name_img.jpg' %}'); height: 350px">
+                <!--상단 제목부분을 누르면 해당 게시판 목록으로 이동-->
+                <a href="#">
+                    <div class="container clearfix">
+                        <div class="dlab-bnr-inr-entry">
+                            <!--제목-->
+                            <!--강의게시판, 스터디게시판, 취미모임게시판 종류에 따라 바뀌도록 변경-->
+                            <h1 class="text-white introduce-letter-spacing_5"><a
+                                    href="{% url 'lect_view' type_no=lect_type.type_no %}"
+                                    style="color: white">{{ lect_type.type_name }}</a></h1>
+                            <!--부제목-->
+                            <!--강의게시판, 스터디게시판, 취미모임게시판 종류에 따라 바뀌도록 변경-->
+                            <p class="m-t20">{{ lect_type.type_exp }}</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!--===============================================입력란=========================================================-->
+            {% load widget_tweaks %}
+            <form action="
+                {% if is_update %}{% url 'lect_update' lect_no=lect_no %}{% else %}{% url 'lect_register' %}{% endif %}"
+                  class="add-listing-form" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {# 히든태그 #}
+                {% for field in lect_form.hidden_fields %}
+                    {{ field }}
+                {% endfor %}
+                <div class="content-block">
+                    <div class="section-full content-inner bg-white">
+                        <div class="container">
+                            <!--=====================-->
+                            {% if lect_type.type_no == 1 %}
+                                <div class="content-box listing-timing-box accordion" id="accordion">
+                                    <div class="content-header listing-timing-header accordion-item"
+                                         data-toggle="collapse"
+                                         data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                        <div class="head-left accordion-header">
+                                            <span><i class="la la-money m-r10"></i>강의비 지급기준/주</span>
+                                        </div>
+                                        <div class="head-right">
+                                            <span class="m-l10"><i class="la la-angle-down"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="content-body collapse" id="collapseOne" aria-labelledby="headingOne"
+                                         data-parent="#accordion">
+                                        <ul class="listing-time-list">
+                                            <li class="open"><span class="listing-day">출석인원 1~5명</span> <span
+                                                    class="listing-hours">￦{{ lect_money_standard.money_1to5|intcomma }}</span>
+                                            </li>
+                                            <hr/>
+                                            <li class="open"><span class="listing-day">출석인원 6~10명</span> <span
+                                                    class="listing-hours">￦{{ lect_money_standard.money_6to10|intcomma }}</span>
+                                            </li>
+                                            <hr/>
+                                            <li class="open"><span class="listing-day">출석인원 11~20명</span> <span
+                                                    class="listing-hours">￦{{ lect_money_standard.money_11to20|intcomma }}</span>
+                                            </li>
+                                            <hr/>
+                                            <li class="open"><span class="listing-day">출석인원 21명 이상</span> <span
+                                                    class="listing-hours">￦{{ lect_money_standard.money_21over|intcomma }}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <!--====================================강의명/스터디명/소모임명 입력 시작==============================================-->
+                            <div class="content-box">
+                                <div class="content-header">
+                                    <!--공통으로 지을만한 이름이 없어서 이 부분만 이렇게 성정하였음, 게시판별로 다르게 보이도록 변경-->
+                                    <h3 class="title">{{ lect_type.type_name }} 이름</h3>
+                                </div>
+                                <div class="content-body">
+                                    <div class="form-group">
+                                        <!--입력하는 곳-->
+                                        {#                                            <input type="text" name="lect_title" ============== 스타일 적용 아직 안함. 폼만 적용됨 ======================= #}
+                                        {#                                                   class="form-control" required="required" placeholder="강의 이름을 적어주세요."#}
+                                        {#                                                   style="font-size: 25px; height: 70px;"/>#}
+                                        {% with lect_type.type_name|addstr:" 제목을 입력하세요." as lect_title_ph %}
+                                            {% render_field lect_form.lect_title class="form-control" placeholder=lect_title_ph %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            </div>
+                            <!--====================================제목 입력 끝=============================================-->
+                            <!--====================================소개 입력 시작==============================================-->
+                            <div class="content-box">
+                                <div class="content-header">
+                                    <h3 class="title">{{ lect_type.type_name }} 소개</h3>
+                                </div>
+                                <div class="content-body">
+                                    <div class="form-group">
+                                        <!--입력하는 곳-->
+                                        {% with  "간략하게 "|addstr:lect_type.type_name|addstr:"를 소개해주세요." as lect_intro_ph %}
+                                            {% render_field lect_form.lect_intro class="form-control" placeholder=lect_intro_ph %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            </div>
+                            <!--====================================소개 입력 끝=============================================-->
+                            <!--====================================일정계획 입력 시작==============================================-->
+                            <div class="content-box">
+                                <div class="content-header">
+                                    <h3 class="title">{{ lect_type.type_name }} 일정계획</h3>
+                                </div>
+                                <div class="content-body">
+                                    <div class="form-group">
+                                        <!--입력하는 곳-->
+                                        {% with lect_type.type_name|addstr:" 계획을 입력하세요" as lect_curri_ph %}
+                                            {% render_field lect_form.lect_curri class="form-control" placeholder=lect_curri_ph %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            </div>
+                            <!--====================================일정계획 입력 끝=============================================-->
+                            <!--====================================요일 입력 시작==============================================-->
+                            <div class="content-box">
+                                <div class="content-header">
+                                    <h3 class="title">요일</h3>
+                                </div>
+                                <div class="content-body">
+                                    <div class="form-group" style="display: flex">
+                                        <!--입력하는 곳-->
+                                        <input name="day" id="mon" value="월" type="checkbox"
+                                                {% if lect_day|is_exist:"월" %}
+                                               checked="checked"
+                                                {% endif %}
+                                               onclick="getCheckboxValue()"/>
+                                        <label class="m-r40" for="mon">월요일</label>
+                                        <input name="day" id="tue" value="화" type="checkbox"
+                                                {% if lect_day|is_exist:"화" %}
+                                               checked="checked"
+                                                {% endif %}
+                                               onclick="getCheckboxValue()"/>
+                                        <label class="m-r40" for="tue">화요일</label>
+                                        <input name="day" id="wen" value="수" type="checkbox"
+                                                {% if lect_day|is_exist:"수" %}
+                                               checked="checked"
+                                                {% endif %}
+                                               onclick="getCheckboxValue()"/>
+                                        <label class="m-r40" for="wen">수요일</label>
+                                        <input name="day" id="thu" value="목" type="checkbox"
+                                                {% if lect_day|is_exist:"목" %}
+                                               checked="checked"
+                                                {% endif %}
+                                               onclick="getCheckboxValue()"/>
+                                        <label class="m-r40" for="thu">목요일</label>
+                                        <input name="day" id="fri" value="금" type="checkbox"
+                                                {% if lect_day|is_exist:"금" %}
+                                               checked="checked"
+                                                {% endif %}
+                                               onclick="getCheckboxValue()"/>
+                                        <label class="m-r40" for="fri">금요일</label>
+                                        <input name="day" id="sat" value="토" type="checkbox"
+                                                {% if lect_day|is_exist:"토" %}
+                                               checked="checked"
+                                                {% endif %}
+                                               onclick="getCheckboxValue()"/>
+                                        <label class="m-r40" for="sat">토요일</label>
+                                        <input name="day" id="sun" value="일" type="checkbox"
+                                                {% if lect_day|is_exist:"일" %}
+                                               checked="checked"
+                                                {% endif %}
+                                               onclick="getCheckboxValue()"/>
+                                        <label class="m-r40" for="sun">일요일</label>
+                                        <input id="result" name="lect_day" value="{{ lect_day }}" type="hidden"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--====================================요일 입력 끝=============================================-->
+                            <!--====================================제한인원 입력 시작==============================================-->
+                            <!--=======강의, 스터디 게시판에서만 사용하기 때문에 취미모임 게시판일 경우에는 뜨지 않도록 수정======-->
+                            <div class="content-box">
+                                <div class="content-header">
+                                    <h3 class="title">{{ lect_type.type_name }} 제한인원</h3>
+                                </div>
+                                <div class="content-body">
+                                    <div class="form-group">
+                                        <!--입력하는 곳-->
+                                        {% with lect_type.type_name|addstr:" 제한인원을 입력하세요. 미 작성 시 무한정 수강 가능하도록 설정됩니다." as lect_limit_num_ph %}
+                                            {% render_field lect_form.lect_limit_num class="form-control" placeholder=lect_limit_num_ph %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            </div>
+                            <!--====================================제한인원 입력 끝=============================================-->
+                            <!--====================================방식 입력 시작==============================================-->
+                            {% if lect_type.type_no != 3 %}
+                                <div class="content-box">
+                                    <div class="content-header">
+                                        <h3 class="title">{{ lect_type.type_name }} 진행 방식</h3>
+                                    </div>
+                                    <div class="content-body">
+                                        <div class="form-group">
+                                            {% render_field lect_form.lect_method id="lect_method" %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!--====================================방식 입력 끝=============================================-->
+                                <!--====================================장소 입력 시작==============================================-->
+                                <div class="content-box">
+                                    <div class="content-header">
+                                        <h3 id="method_name" class="title">{{ pol_name }}</h3>
+                                    </div>
+                                    <div class="content-body">
+                                        <div class="form-group">
+                                            <!--입력하는 곳-->
+                                            {% with lect_type.type_name|addstr:" 방식을 먼저 선택하세요." as lect_pol_ph %}
+                                                {% render_field lect_form.lect_place_or_link class="form-control" id="lect_place_or_link" placeholder=lect_pol_ph %}
+                                            {% endwith %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <!--====================================장소 입력 끝=============================================-->
+                            <!--====================================신청마감일 입력 시작==============================================-->
+                            <!--=======강의, 스터디 게시판에서만 사용하기 때문에 취미모임 게시판일 경우에는 뜨지 않도록 수정======-->
+                            <div class="content-box">
+                                <div class="content-header">
+                                    <h3 class="title">{{ lect_type.type_name }} 신청마감일</h3>
+                                </div>
+                                <div class="content-body">
+                                    <div class="form-group">
+                                        <!--입력하는 곳-->
+                                        {% render_field lect_form.lect_deadline class="form-control" type="date" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <!--====================================신청마감일 입력 끝=============================================-->
+                            <!--====================================대표이미지 입력 입력 시작=============================================-->
+
+                            <div class="content-box">
+                                <div class="content-header">
+                                    <h3 class="title">대표이미지</h3>
+                                </div>
+                                <div class="content-body">
+                                    <div class="form-group">
+                                        {% render_field lect_pic_form.lect_pic %}
+                                        {% if is_update %}
+                                            <p class="font-10 mb-1 mt-3" style="text-align:center; color:red">
+                                                사진을 등록하지 않을 시, 기존 사진을 유지하며, 새로운 사진을 등록할 경우, 기존 사진이 대체됩니다.</p>
+                                        {% else %}
+                                            <p class="font-10 mb-1 mt-3" style="text-align:center; color:red">
+                                                두 장 이상의 사진을 첨부 할 경우 마지막 사진이 등록됩니다.</p>
+                                        {% endif %}
+                                    </div>
+                                    <!-- 이미 존재하고 있던 이미지: 삭제 가능 (수정모드)-->
+                                    {% if lect is not None %}
+                                        <div class="form-group">
+                                            <div id="image-cont" class="image-cont">
+                                                {% for lect_file in lect_file_list %}
+                                                    <div id="image-card-{{ lect_file.lect_file_id }}"
+                                                         class="image-card">
+                                                        <!-- 취소 버튼, 취소를 누를 시 image-card 컨테이너가 통채로 사라짐. -->
+                                                        <button type="button"
+                                                                class="btn btn-danger fa fa-times btn-cancel"
+                                                                onclick="delImg(document.getElementById('image-card-{{ lect_file.lect_file_id }}'))"></button>
+                                                        <!-- 이미지 컨테이너 이미지 파일일 경우 img태그가, 이미지 파일이 아닐 경우 파일 모양의 아이콘이 붙음. -->
+                                                        <div id="image-{{ lect_file.lect_file_id }}"
+                                                             class="image-container"></div>
+                                                        <!--기존 파일링크를 이동시키기 위한 히든 링크 -->
+                                                        <input type="hidden"
+                                                               name="exist_file_path_{{ lect_file.lect_file_id }}"
+                                                               value="{{ lect_file.lect_file_path }}"/>
+                                                    </div>
+                                                    <script>
+                                                        // 페이지가 로딩 될 때 해당 함수도 자동으로 실행되도록 설정함. (아이콘 or img 결정)
+                                                        onload = decisionIcon(document.getElementById("image-{{ lect_file.lect_file_id }}"), '{{ lect_file.lect_file_path }}');
+                                                    </script>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!--====================================대표이미지 입력 끝=============================================-->
+
+                            <!--등록하기 버튼, 누르면 게시글 상세보기로-->
+                            <!--최초 글작성 시 나오는 버튼-->
+                            <div style="display: grid; justify-items: center">
+                                <input class="site-button btn-block button-md" type="submit" style="width: 30%"
+                                       value="{% if is_update %}수정하기{% else %}등록하기{% endif %}"
+                                       onclick="return validation_check_for_lecture();">
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% include "file_script.html" %}
+{% endblock %}
