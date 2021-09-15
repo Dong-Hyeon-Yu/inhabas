@@ -33,25 +33,27 @@
                 <div class="section-full content-inner bg-white">
                     <div class="container">
                         <!-- 검색창 및 진행중/마감 필터바 -->
-                        <div class="listing-filter m-b40">
+                    <!-- 및 div는 원래 사용하던 div임. 필터 구현시 사용할 것 -->
+{#                        <div class="listing-filter m-b40">#}
+                        <div class="d-flex justify-content-end m-b60">
                             <!-- 검색창용 form 태그 -->
                             <form action="{% url 'lect_search' type_no=type.type_no %}" method="get">
                                 <div class="input-group">
                                     <!-- 필터바(해당 게시글만 보이게하는 것 구현 진행중 - 커밍쑨) -->
-                                    <div class="m-r15">
-                                        <ul class="filter m-b0">
-                                            <li>
-                                                <select>
-                                                    <!-- 모든 게시글이 보이게 처리예정 -->
-                                                    <option>전체보기</option>
-                                                    <!-- 강의, 취미, 공모전 진행중인 게시글이 보이게 처리 -->
-                                                    <option>진행중</option>
-                                                    <!-- 강의, 취미, 공모전 마감된 게시글이 보이게 처리 -->
-                                                    <option>마감</option>
-                                                </select>
-                                            </li>
-                                        </ul>
-                                    </div>
+{#                                    <div class="m-r15">#}
+{#                                        <ul class="filter m-b0">#}
+{#                                            <li>#}
+{#                                                <select>#}
+{#                                                    <!-- 모든 게시글이 보이게 처리예정 -->#}
+{#                                                    <option>전체보기</option>#}
+{#                                                    <!-- 강의, 취미, 공모전 진행중인 게시글이 보이게 처리 -->#}
+{#                                                    <option>진행중</option>#}
+{#                                                    <!-- 강의, 취미, 공모전 마감된 게시글이 보이게 처리 -->#}
+{#                                                    <option>마감</option>#}
+{#                                                </select>#}
+{#                                            </li>#}
+{#                                        </ul>#}
+{#                                    </div>#}
                                     <!-- 검색창 div -->
                                     <div class="lect-search-bar">
                                         <!-- 검색창 input 태그 -->
