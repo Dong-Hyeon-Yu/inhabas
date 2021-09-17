@@ -89,7 +89,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    #'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'IBAS.urls'
@@ -176,7 +176,7 @@ STATIC_ROOT = os.path.join(ROOT_DIR, '.static_root')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
-STATICFILES_STORAGE = 'IBAS.storage.CompressAndHashStaticFilesStorage'  #'IBAS.storage.StaticFilesMd5HashingStorage'
+STATICFILES_STORAGE = 'IBAS.storage.StaticFilesMd5HashingStorage'
 # WHITENOISE_MANIFEST_STRICT = False  # 왜 안되지
 
 # social 로그인 패키지 설정

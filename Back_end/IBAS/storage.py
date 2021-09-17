@@ -1,13 +1,13 @@
-from whitenoise.storage import CompressedManifestStaticFilesStorage
+from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
 from urllib.parse import unquote, urlsplit, urlunsplit
 import os
 
 
 # static 못 찾으면 500 오류 뱉어내는거 수정
-class CompressAndHashStaticFilesStorage(CompressedManifestStaticFilesStorage):
+class StaticFilesMd5HashingStorage(ManifestStaticFilesStorage):
     manifest_strict = False
 
-    def _hashed_name(self, name, content=None, filename=None):
+    def hashed_name(self, name, content=None, filename=None):
         # `filename` is the name of file to hash if `content` isn't given.
         # `name` is the base name to construct the new hashed filename from.
         parsed_name = urlsplit(unquote(name))
@@ -40,12 +40,6 @@ class CompressAndHashStaticFilesStorage(CompressedManifestStaticFilesStorage):
         if '?#' in name and not unparsed_name[3]:
             unparsed_name[2] += '?'
         return urlunsplit(unparsed_name)
-
-    def hashed_name(self, *args, **kwargs):
-        name = self._hashed_name(*args, **kwargs)
-        if self._new_files is not None:
-            self._new_files.add(self.clean_name(name))
-        return name
 
 
 
