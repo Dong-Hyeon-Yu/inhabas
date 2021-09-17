@@ -1,3 +1,4 @@
 *config/
 *log/
 *media/
+*.static_root/
