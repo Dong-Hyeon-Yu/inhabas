@@ -30,55 +30,74 @@ def get_email_list(user_model):
     return user_email_list
 
 
+def _get_exist_member_list(cur_user):
+    # 기존 회원 리스트
+    if cur_user.user_role_id == 4:  # 총무일 경우
+        exist_user_list = User.objects.filter(
+            Q(user_auth_id__lt=3) & Q(user_role_id=6) & Q(user_role__isnull=False))
+    else:  # 그 외 회장단일 경우
+        exist_user_list = User.objects.filter(
+            Q(user_auth_id__lt=3) & Q(user_role_id__gt=1) & Q(user_role__isnull=False))
+        for exist_user in exist_user_list:
+            users_under_expulsion = UserDelete.objects.filter(Q(deleted_user=exist_user) & Q(user_delete_state_id=1))
+            if len(users_under_expulsion) > 0:
+                exist_user.is_going_to_delete = True
+                exist_user.delete_no = users_under_expulsion.first().user_delete_no
+            else:
+                exist_user.is_going_to_delete = False
+                exist_user.delete_no = 1
+    return exist_user_list.order_by("user_auth_id", "user_role_id", "user_stu")
+
+
+def _get_auth_list_or_role_list(cur_user):
+    auth_list, role_list = [], []
+    if role_check(cur_user, 4):  # 총무일 경우
+        # 기존 회원은 미승인 회원으로 넘길 수 없으므로, role_no 가 2 이하만 가져옴.
+        auth_list = UserAuth.objects.filter(auth_no__lte=2)
+
+    if role_check(cur_user, 1):  # 로그인 한 유저의 권한이 회장일 경우
+        role_list = UserRole.objects.filter(~Q(role_no=5))  # 교수를 제외한 모든 유저의 권한을 조정가능.
+    elif role_check(cur_user, 2):  # 로그인 한 유저의 권한이 부회장 인 경우
+        role_list = UserRole.objects.filter(Q(role_no__gt=2) & ~Q(role_no=5))  # 회장, 부회장, 교수를 제외한 유저의 권한을 조정할 수 있음.
+
+    return auth_list, role_list
+
+
 @superuser_only(cfo_included=True)
-def staff_member_list(request):
+def total_member_list(request):
+    # 현재 접속 유저
     user = get_logined_user(request)
-    if user.user_role.role_no <= 4:  # 회원에 대한 관리는 회장단만
-        new_user_list = User.objects.filter(Q(user_auth__auth_no=3) & Q(user_role__isnull=False)).order_by("-user_joined")  # 신입 부원 리스트
-        if user.user_role.role_no == 4:  # 총무일 경우
-            exist_user_list = User.objects.filter(
-                ~Q(user_auth__auth_no=3) & Q(user_role__role_no=6) & Q(user_role__isnull=False))
-        else:
-            exist_user_list = User.objects.filter(
-                ~Q(user_auth__auth_no=3) & ~Q(user_role__role_no=1) & Q(user_role__isnull=False))  # 기존 회원 리스트
-            for exist_user in exist_user_list:
-                if len(UserDelete.objects.filter(Q(deleted_user=exist_user) & Q(user_delete_state__state_no=1))) != 0:
-                    exist_user.is_going_to_delete = True
-                    exist_user.delete_no = UserDelete.objects.filter(
-                        Q(deleted_user=exist_user) & Q(user_delete_state__state_no=1)).first().user_delete_no
-                else:
-                    exist_user.is_going_to_delete = False
-                    exist_user.delete_no = 1
-        exist_user_list = exist_user_list.order_by("user_auth_id", "user_role_id")
-        user_update_request_list = UserUpdateRequest.objects.filter(updated_state__state_no=1)  # 이름 변경 신청을 받는 리스트
+
+    # 회원에 대한 관리는 회장단만
+    if user.user_role_id <= 4:
+        # 신입 부원 페이지당 10명
+        new_user_list = User.objects.filter(Q(user_auth_id=3) & Q(user_role__isnull=False)).order_by("-user_joined")
         new_user_items = get_paginator_list(request, "new_user", new_user_list, 10)
+
+        # 기존 회원 페이지당 10명
+        exist_user_list = _get_exist_member_list(user)
         exist_user_items = get_paginator_list(request, "exist_user", exist_user_list, 10)
-        user_update_request_items = get_paginator_list(request, "request", user_update_request_list, 5)
-        grade_list = list()
-        for new_user in new_user_list:
-            grade_list.append(new_user.user_grade)
-        grade_list = list(set(grade_list))
-        grade_list.sort()
-        auth_list = UserAuth.objects.filter(auth_no__lte=2)  # 기존 회원은 미승인 회원으로 넘길 수 없으므로, role_no 가 2 이하인 튜플만 가져옴.
-        role_list = {}
-        if role_check(user, 1):  # 로그인 한 유저의 권한이 회장일 경우
-            role_list = UserRole.objects.filter(~Q(role_no=5))  # 교수를 제외한 모든 유저의 권한을 조정가능.
-        elif role_check(user, 2):  # 로그인 한 유저의 권한이 부회장 인 경우
-            role_list = UserRole.objects.filter(Q(role_no__gt=2) & ~Q(role_no=5))  # 회장, 부회장, 교수를 제외한 유저의 권한을 조정할 수 있음.
+
+        # 이름 변경 신청 페이지당 3개
+        user_update_request_list = UserUpdateRequest.objects.filter(updated_state_id=1)
+        user_update_request_items = get_paginator_list(request, "request", user_update_request_list, 3)
+
         # 제명 리스트 받아오기 (최신 상위 5개만)
         user_delete_list = UserDelete.objects.all().order_by("-user_delete_created")[:5]
-        context = {  # 컨텍스트에 등록
+
+        # 필터 적용을 위한 옵션 가져오기
+        auth_list, role_list = _get_auth_list_or_role_list(user)
+
+        context = {
             "exist_user_list": exist_user_items,
-            "exist_user_len": len(exist_user_list),
+            "total_exist_users": len(exist_user_list),
             "new_user_list": new_user_items,
-            "new_user_len": len(new_user_list),
-            "grade_list": grade_list,
-            "auth_list": auth_list,
+            "total_new_users": len(new_user_items),
             "user_update_request_list": user_update_request_items,
-            "user_delete_list": user_delete_list
+            "user_delete_list": user_delete_list,
+            "role_list": role_list,
+            "auth_list": auth_list,
         }
-        if role_list:
-            context.update(role_list=role_list)
 
         return render(request, "member_manage.html", context)  # 유저 리스트 페이지를 랜더링
     else:  # 그 외의 권한을 가진 자가 접근할 경우 (해킹 시도)
@@ -86,7 +105,70 @@ def staff_member_list(request):
 
 
 @superuser_only(cfo_included=True)
-def staff_member_update(request):
+def exist_member_list(request):
+    user = get_logined_user(request)
+
+    # 회원에 대한 관리는 회장단만
+    if user.user_role_id <= 4:
+        # 검색 요청일 경우
+        if keyword := request.GET.get("keyword", None):
+            exist_user_list = []
+            if user.user_role_id == 4:
+                exist_user_list = User.objects.filter(
+                    Q(user_auth_id__lt=3) & Q(user_role_id=6) & Q(user_role__isnull=False)
+                    & (Q(user_stu__icontains=keyword) | Q(user_name__icontains=keyword))
+                ).order_by('user_name', 'user_stu')
+            elif user.user_role_id < 4:
+                exist_user_list = User.objects.filter(
+                    Q(user_auth_id__lt=3) & Q(user_role_id__gt=1) & Q(user_role__isnull=False)
+                    & (Q(user_stu__icontains=keyword) | Q(user_name__icontains=keyword))
+                ).order_by('user_name', 'user_stu')
+        else:
+            exist_user_list = _get_exist_member_list(user)
+
+        exist_user_items = get_paginator_list(request, "exist_user", exist_user_list, 20)
+
+        # 필터 적용을 위한 옵션 가져오기
+        auth_list, role_list = _get_auth_list_or_role_list(user)
+
+        context = {
+            "exist_user_list": exist_user_items,
+            "total_exist_users": len(exist_user_list),
+            "role_list": role_list,
+            "auth_list": auth_list,
+        }
+        return render(request, "exist_member_list.html", context)
+    else:
+        return redirect(reverse("index"))
+
+
+@superuser_only(cfo_included=True)
+def new_member_list(request):
+    user = get_logined_user(request)
+    if user.user_role_id <= 4:  # 회원에 대한 관리는 회장단만
+        new_user_list = User.objects.filter(Q(user_auth_id=3) & Q(user_role__isnull=False)).order_by("user_stu")
+
+        if keyword := request.GET.get("keyword", None):  # 검색 요청일 경우
+            new_user_list = new_user_list.filter(Q(user_stu__icontains=keyword) | Q(user_name__icontains=keyword))
+
+        new_user_items = get_paginator_list(request, "new_user", new_user_list, 20)
+
+        # 필터 적용을 위한 옵션 가져오기
+        auth_list, role_list = _get_auth_list_or_role_list(user)
+
+        context = {
+            "new_user_list": new_user_items,
+            "total_new_users": len(new_user_items),
+            "role_list": role_list,
+            "auth_list": auth_list,
+        }
+        return render(request, "new_member_list.html", context)
+    else:
+        return redirect(reverse("index"))
+
+
+@superuser_only(cfo_included=True)
+def member_update(request):
     if request.method == "POST":  # 파라미터가 POST로 넘어왔는가? (정상적인 접근)
         user_auth = request.POST.get("user_auth")
         user_role = request.POST.get("user_role")

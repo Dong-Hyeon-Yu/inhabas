@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load table_tags %}
 {% load static %}
 {% block content %}
     <!--커스텀 css-->
@@ -68,12 +69,13 @@
                 <div class="section-full content-inner bg-white">
                     <div class="container">
                         <!--회원관리-->
-                        {% if logined_user.user_role.role_no != 4 %}
+                        {% if logined_user.user_role_id != 4 %}
                             <div class="content-box">
                                 <!-- 제목 div -->
-                                <div class="content-header">
+                                <div class="content-header d-flex justify-content-between">
                                     <h3 class="title"><i class="la la-users m-r5"></i>신입부원 관리&nbsp;
-                                        <span class="font-12 text-red">({{ new_user_len }})</span></h3>
+                                        <span class="font-12 text-red">({{ total_new_users }})</span></h3>
+                                    {% if new_user_list %}<a href="{% url 'new_member_list' %}" class="font-12">더보기</a>{% endif %}
                                 </div>
                                 <!-- 신입부원 관리 콘텐츠 시작 -->
                                 <div class="content-body">
@@ -153,7 +155,7 @@
                                             <!-- 신입부원 관리 테이블 내용 시작 -->
                                             <tbody>
                                             <!-- =========================== 여기부터 복붙 ============================== -->
-                                            {% if new_user_len == 0 %}
+                                            {% if new_user_list|length == 0 %}
                                                 <tr>
                                                     <td colspan="8" style="text-align: center"> 입부 신청 대기중인
                                                         회원이
@@ -177,7 +179,7 @@
                                                         </div>
 
                                                     </td>
-                                                    <th class="text-center">{{ forloop.counter }}</th>
+                                                    <th class="text-center">{% table_row_index new_user_list forloop.counter0 %}</th>
                                                     <!-- 회원 이름 -->
                                                     <td class="text-center">{{ new_user.user_name }}</td>
                                                     <!-- 회원 학년 -->
@@ -209,58 +211,23 @@
                                             {% endfor %}
                                             </tbody>
                                         </table>
+
                                         {% if new_user_list|length != 0 %}
-                                            <!--페이지네이션-->
-                                            <div style="display: flex; justify-content: center; align-items: center">
-                                                <nav aria-label="Page navigation example">
-                                                    <!-- staff_margin_bottom_0는 staff_cr.css에 정의되어 있음.  -->
-                                                    <ul class="pagination m-b0">
-                                                        {% if new_user_list.has_previous %}
-                                                            <li class="page-item">
-                                                                <a class="page-link" href="?new_user_page=1"
-                                                                   aria-label="Previous">
-                                                                    <span aria-hidden="true">&laquo;</span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="page-item">
-                                                                <a class="page-link"
-                                                                   href="?new_user_page={{ new_user_list.previous_page_number }}">
-                                                                    {{ new_user_list.previous_page_number }}
-                                                                </a>
-                                                            </li>
-                                                        {% endif %}
-                                                        <li class="page-item active"><a class="page-link"
-                                                                                        href="#">{{ new_user_list.number }}</a>
-                                                        </li>
-                                                        {% if new_user_list.has_next %}
-                                                            <li class="page-item"><a class="page-link"
-                                                                                     href="?new_user_page={{ new_user_list.next_page_number }}">
-                                                                {{ new_user_list.next_page_number }}
-                                                            </a>
-                                                            </li>
-                                                            <li class="page-item">
-                                                                <a class="page-link"
-                                                                   href="?new_user_page={{ new_user_list.paginator.num_pages }}"
-                                                                   aria-label="Next">
-                                                                    <span aria-hidden="true">&raquo;</span>
-                                                                </a>
-                                                            </li>
-                                                        {% endif %}
-                                                    </ul>
-                                                </nav>
-                                            </div>
+                                            {% include "_pagination.html" with item_list=new_user_list page_name="new_user_page" %}
                                         {% endif %}
-                                        <!--페이지네이션 끝-->
+
                                     </div>
                                 </div>
                             </div>
                         {% endif %}
-                        {% if logined_user.user_role.role_no <= 4 %}
+                        {% if logined_user.user_role_id <= 4 %}
                             <!-- 회원 관리 콘텐츠 시작 -->
                             <div class="content-box">
-                                <div class="content-header">
+                                <div class="content-header d-flex justify-content-between">
                                     <h3 class="title"><i class="la la-tasks m-r5"></i>동아리원 현황&nbsp;
-                                        <span class="font-12 text-red">({{ exist_user_len }})</span></h3></h3>
+                                        <span class="font-12 text-red">({{ total_exist_users }})</span></h3></h3>
+                                    {% if exist_user_list %}
+                                        <a href="{% url 'exist_member_list' %}" class="font-12">더보기</a>{% endif %}
                                 </div>
                                 <!-- 동아리원현황 관리 콘텐츠 시작 -->
                                 <form action="{% url 'staff_member_update' %}" method="post">
@@ -268,10 +235,7 @@
                                     <div class="content-body">
                                         <!-- 내가 작성한 댓글 내용 담는 div -->
                                         <div class="myinfo-table-padding">
-                                            {# 권한: 활동회원, 비활동, 미승인#}
-                                            {# 역할: 회장, 부회장, 총무, 기획팀, 운영팀(회장단), 교수, 일반회원#}
 
-                                            <!-- staff_mem_select는 staff_cr.css에 정의되어 있음.  -->
                                             {% if logined_user.user_role.role_no == 4 %}
                                                 <div class="staff_mem_select m-b20">
                                                     <select name="user_auth">
@@ -303,7 +267,7 @@
                                                 </div>
                                             {% endif %}
                                             <!-- staff_mem_btn는 staff_cr.css에 정의되어 있음.  -->
-                                            {% if logined_user.user_role.role_no <= 2 or logined_user.user_role.role_no == 4 %}
+                                            {% if logined_user.user_role_id <= 2 or logined_user.user_role_id == 4 %}
                                                 <div class="staff_mem_btn m-b20 listing-info-right">
                                                     <!-- &nbsp;는 띄어쓰기 -->
                                                     <button class="site-button" type="submit"><i
@@ -343,8 +307,8 @@
                                                 </thead>
                                                 <!-- 댓글 내용 테이블 -->
                                                 <tbody>
-                                                <!-- ===========================여기부터 복붙============================== -->
-                                                {% if exist_user_len == 0 %}
+
+                                                {% if exist_user_list|length == 0 %}
                                                     <td colspan="8" style="text-align: center">회원 리스트에 회원이
                                                         존재하지 않습니다.
                                                     </td>
@@ -364,7 +328,7 @@
                                                                 </div>
                                                             {% endif %}
                                                         </td>
-                                                        <th>{{ forloop.counter }}</th>
+                                                        <th>{% table_row_index exist_user_list forloop.counter0 %}</th>
                                                         <!-- 회원 이름 -->
                                                         <td class="text-center">{{ exist_user.user_name }}</td>
                                                         <!-- 회원 학번 -->
@@ -397,89 +361,32 @@
                                                 {% endfor %}
                                                 </tbody>
                                             </table>
-                                            <!-- 검색창 시작 -->
-                                            <form action="" method="get">
-                                                <div class="input-group d-flex justify-content-end m-t30 m-b30">
-                                                    <!-- 검색창 div -->
-                                                    <div class="lect-search-bar d-flex width-310">
-                                                        <!-- 검색창 input 태그 -->
 
-                                                        <input name="keyword" type="text" class="form-control"
-                                                               placeholder="검색어를 입력하세요.">
-                                                        <span class="input-group-btn ">
-                                                            <!-- 검색버튼 -->
-                                                            <button type="submit" class="site-button">
-                                                                <i class="fa fa-search"></i>
-                                                            </button>
-                                                        </span>
+                                            {% if exist_user_list %}
+                                                {% include "_pagination.html" with page_name="exist_user_page" item_list=exist_user_list%}
+                                            {% endif %}
 
-                                                    </div>
-                                                </div>
-                                            </form>
-                                            <!-- 검색창 끝 -->
-                                            <!--페이지네이션-->
-                                            <div style="display: flex; justify-content: center; align-items: center">
-                                                <nav aria-label="Page navigation example">
-                                                    <!-- staff_margin_bottom_0는 staff_cr.css에 정의되어 있음.  -->
-                                                    <ul class="pagination m-b0">
-                                                        {% if exist_user_list.has_previous %}
-                                                            <li class="page-item">
-                                                                <a class="page-link"
-                                                                   href="?exist_user_page=1"
-                                                                   aria-label="Previous">
-                                                                    <span aria-hidden="true">&laquo;</span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="page-item">
-                                                                <a class="page-link"
-                                                                   href="?exist_user_page={{ exist_user_list.previous_page_number }}">
-                                                                    {{ exist_user_list.previous_page_number }}
-                                                                </a>
-                                                            </li>
-                                                        {% endif %}
-                                                        <li class="page-item active"><a class="page-link"
-                                                                                        href="#">{{ exist_user_list.number }}</a>
-                                                        </li>
-                                                        {% if exist_user_list.has_next %}
-                                                            <li class="page-item"><a class="page-link"
-                                                                                     href="?exist_user_page={{ exist_user_list.next_page_number }}">
-                                                                {{ exist_user_list.next_page_number }}
-                                                            </a>
-                                                            </li>
-                                                            <li class="page-item">
-                                                                <a class="page-link"
-                                                                   href="?exist_user_page={{ exist_user_list.paginator.num_pages }}"
-                                                                   aria-label="Next">
-                                                                    <span aria-hidden="true">&raquo;</span>
-                                                                </a>
-                                                            </li>
-                                                        {% endif %}
-                                                    </ul>
-                                                </nav>
-                                            </div>
-                                            <!--페이지네이션 끝-->
                                         </div>
                                     </div>
                                 </form>
-                                </form>
+
                             </div>
                         {% endif %}
 
-                        <!------------------------------여기서부터 백엔드 작업 시작---------------------------------->
-                        {% if logined_user.user_role.role_no <= 2 %}
-                            <!-- 요청사항 콘텐츠 시작 -->
+
+                        {% if logined_user.user_role_id <= 2 %}
+
                             <div class="content-box">
                                 <div class="content-header">
                                     <h3 class="title"><i class="la la-check-square m-r5"></i>이름 변경 요청 리스트</h3>
                                 </div>
-                                <!-- 요청사항 실질 콘텐츠 시작 -->
-                                <!-- form 태그 수정 해야함 -->
+
 
                                 <div class="content-body">
                                     <div class="myinfo-table-padding">
                                         <form action="{% url 'member_update_name' %}" method="post">
                                             {% csrf_token %}
-                                            <!-- staff_mem_select는 staff_cr.css에 정의되어 있음.  -->
+
                                             <div class="staff_mem_select m-b20">
                                                 <select id="select-aor" name="aor">
                                                     <option selected="selected" name="aor" value="0">승인 여부
@@ -500,10 +407,8 @@
 
                                             <!-- 내용 테이블 -->
                                             <table class="table">
-                                                <!-- 테이블 1행: 제목 -->
                                                 <thead>
                                                 <tr>
-                                                    <!-- staff_width는 staff_yejin.css에 정의되어 있음.  -->
                                                     <th class="border-top-0 width-50 min-width-50"></th>
                                                     <th class="border-top-0 width-50 min-width-50"
                                                         scope="col"></th>
@@ -527,90 +432,55 @@
                                                     </th>
                                                 </tr>
                                                 </thead>
-                                                <!-- 내용 테이블 -->
+
                                                 <tbody>
-                                                <!-- ===========================여기부터 복붙============================== -->
                                                 {% if user_update_request_list|length == 0 %}
                                                     <tr>
                                                         <td colspan="8" style="text-align: center">
                                                             승인 대기중인 이름 변경 요청이 없습니다.
                                                         </td>
                                                     </tr>
-                                                {% endif %}
-                                                {% for user_update_request in user_update_request_list %}
-                                                    <tr>
-                                                        <td scope="row">
-                                                            <div class="input-block">
-                                                                <input id="check-{{ forloop.counter }}"
-                                                                       type="checkbox"
-                                                                       name="user_request_list[]"
-                                                                       value="{{ user_update_request.updated_no }}">
-                                                                <!-- staff_label_margin는 staff_cr.css에 정의되어 있음.  -->
-                                                                <label for="check-{{ forloop.counter }}"
-                                                                       class="staff_label_margin"></label>
-                                                            </div>
-                                                        </td>
-                                                        <th>{{ forloop.counter }}</th>
-                                                        <!-- 회원 이름 -->
-                                                        <td class="text-center">{{ user_update_request.updated_user.user_name }}</td>
-                                                        <!-- 회원 학번 -->
-                                                        <td class="text-center">{{ user_update_request.updated_user.user_stu }}</td>
-                                                        <!-- 회원 학과 -->
-                                                        <td>{{ user_update_request.updated_user.user_major.major_name }}</td>
-                                                        <!-- 변경 전 이름 -->
-                                                        <td class="text-center">
-                                                            {{ user_update_request.updated_user.user_name }}
-                                                        </td>
-                                                        <!-- 변경 신청한 이름 -->
-                                                        <td class="text-center">
-                                                            {{ user_update_request.updated_user_name }}
-                                                        </td>
+                                                {% else %}
+                                                    {% for user_update_request in user_update_request_list %}
+                                                        <tr>
+                                                            <td scope="row">
+                                                                <div class="input-block">
+                                                                    <input id="check-{{ forloop.counter }}"
+                                                                           type="checkbox"
+                                                                           name="user_request_list[]"
+                                                                           value="{{ user_update_request.updated_no }}">
+                                                                    <!-- staff_label_margin는 staff_cr.css에 정의되어 있음.  -->
+                                                                    <label for="check-{{ forloop.counter }}"
+                                                                           class="staff_label_margin"></label>
+                                                                </div>
+                                                            </td>
+                                                            <th>{% table_row_index user_update_request_list forloop.counter0 %}</th>
+                                                            <!-- 회원 이름 -->
+                                                            <td class="text-center">{{ user_update_request.updated_user.user_name }}</td>
+                                                            <!-- 회원 학번 -->
+                                                            <td class="text-center">{{ user_update_request.updated_user.user_stu }}</td>
+                                                            <!-- 회원 학과 -->
+                                                            <td>{{ user_update_request.updated_user.user_major.major_name }}</td>
+                                                            <!-- 변경 전 이름 -->
+                                                            <td class="text-center">
+                                                                {{ user_update_request.updated_user.user_name }}
+                                                            </td>
+                                                            <!-- 변경 신청한 이름 -->
+                                                            <td class="text-center">
+                                                                {{ user_update_request.updated_user_name }}
+                                                            </td>
 
-                                                    </tr>
-                                                {% endfor %}
+                                                        </tr>
+                                                    {% endfor %}
+                                                {% endif %}
+
                                                 </tbody>
                                             </table>
-                                            <!--페이지네이션-->
-                                            <div style="display: flex; justify-content: center; align-items: center">
-                                                <nav aria-label="Page navigation example">
-                                                    <!-- staff_margin_bottom_0는 staff_cr.css에 정의되어 있음.  -->
-                                                    <ul class="pagination m-b0">
-                                                        {% if user_update_request_list.has_previous %}
-                                                            <li class="page-item">
-                                                                <a class="page-link"
-                                                                   href="?request_page=1"
-                                                                   aria-label="Previous">
-                                                                    <span aria-hidden="true">&laquo;</span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="page-item">
-                                                                <a class="page-link"
-                                                                   href="?request_page={{ user_update_request_list.previous_page_number }}">
-                                                                    {{ user_update_request_list.previous_page_number }}
-                                                                </a>
-                                                            </li>
-                                                        {% endif %}
-                                                        <li class="page-item active"><a class="page-link"
-                                                                                        href="#">{{ user_update_request_list.number }}</a>
-                                                        </li>
-                                                        {% if user_update_request_list.has_next %}
-                                                            <li class="page-item"><a class="page-link"
-                                                                                     href="?request_page={{ user_update_request_list.next_page_number }}">
-                                                                {{ user_update_request_list.next_page_number }}
-                                                            </a>
-                                                            </li>
-                                                            <li class="page-item">
-                                                                <a class="page-link"
-                                                                   href="?request_page={{ user_update_request_list.paginator.num_pages }}"
-                                                                   aria-label="Next">
-                                                                    <span aria-hidden="true">&raquo;</span>
-                                                                </a>
-                                                            </li>
-                                                        {% endif %}
-                                                    </ul>
-                                                </nav>
-                                            </div>
-                                            <!--페이지네이션 끝-->
+
+                                            {% if user_update_request_list %}
+                                                {% include "_pagination.html" with page_name="request_page" item_list=user_update_request_list %}
+                                            {% endif %}
+
                                         </form>
                                     </div>
                                 </div>
@@ -623,7 +493,8 @@
                         <div class="content-box">
                             <div class="content-header d-flex justify-content-between">
                                 <h3 class="title"><i class="la la-sign-out m-r5"></i>제명안건 관리</h3>
-                                <a href="{% url 'member_delete_list' %}">더보기</a>
+                                {% if user_delete_list %}
+                                    <a href="{% url 'member_delete_list' %}" class="font-12">더보기</a>{% endif %}
                             </div>
 
                             <!-- 요청사항 실질 콘텐츠 시작 -->
