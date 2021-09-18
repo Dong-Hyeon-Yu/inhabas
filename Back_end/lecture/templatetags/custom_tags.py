@@ -78,4 +78,23 @@ def personal_info(string, request, lect):
                     return string[0] + '*' * (len(string) - 1)
 
 
+@register.simple_tag
+def get_GET_url(full_path, param, value):
+    l, r = full_path.find('?'), full_path.find('=')
+    print(param)
+    if l == -1:
+        return full_path + "?" + param + "=" + str(value)
+
+    while l < r:
+        print(l, r)
+        if full_path[l + 1:r] == param:
+            if full_path[r:].find('&') == -1:
+                return full_path[:r] + "=" + str(value)
+            else:
+                return full_path[:r] + "=" + str(value) + full_path[full_path[r:].find('&') + r:]
+
+        l = full_path[r+1:].find('&') + r + 1
+        r = full_path[r+1:].find('=') + r + 1
+
+    return full_path + "&" + param + "=" + str(value)
 

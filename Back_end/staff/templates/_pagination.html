@@ -1,3 +1,4 @@
+{% load custom_tags %}
 <!--페이지네이션-->
     <div style="display: flex; justify-content: center; align-items: center">
         <nav aria-label="Page navigation example">
@@ -5,14 +6,14 @@
             <ul class="pagination m-b0">
                 {% if item_list.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?{{ page_name }}=1"
+                        <a class="page-link" href="{% get_GET_url request.get_full_path page_name 1%}"
                            aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
                         <a class="page-link"
-                           href="?{{ page_name }}={{ item_list.previous_page_number }}">
+                           href="{% get_GET_url request.get_full_path page_name item_list.previous_page_number %}">
                             {{ item_list.previous_page_number }}
                         </a>
                     </li>
@@ -22,13 +23,13 @@
                 </li>
                 {% if item_list.has_next %}
                     <li class="page-item"><a class="page-link"
-                                             href="?{{ page_name }}={{ item_list.next_page_number }}">
+                                             href="{% get_GET_url request.get_full_path page_name item_list.next_page_number %}">
                         {{ item_list.next_page_number }}
                     </a>
                     </li>
                     <li class="page-item">
                         <a class="page-link"
-                           href="?{{ page_name }}={{ item_list.paginator.num_pages }}"
+                           href="{% get_GET_url request.get_full_path page_name item_list.paginator.num_pages %}"
                            aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>

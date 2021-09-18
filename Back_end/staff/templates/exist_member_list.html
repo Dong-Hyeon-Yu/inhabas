@@ -3,7 +3,35 @@
 {% load static %}
 {% block content %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/ibas_contents.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/size.css' %}">
     <script src="{% static 'js/ibas_centents.js' %}"></script>
+    <script src="{% static 'js/form.js' %}"></script>
+    <script>
+        function selectAoR() {
+            itemidSelect = document.getElementById('select-aor');
+            document.getElementById("input-aor").value = itemidSelect.options[itemidSelect.selectedIndex].value;
+        }
+
+        function decideChk(obj, user_stu) {
+            if (obj.checked === true) {
+                document.getElementById('new-user-check-' + user_stu).checked = true;
+            } else {
+                document.getElementById('new-user-check-' + user_stu).checked = false;
+            }
+        }
+
+    </script>
+
+    <style>
+        /* 페이지네이션 클릭 시 색 관련 css*/
+        .page-item.active .page-link {
+            z-index: 1;
+            color: #fff;
+            background-color: #4611a7;
+            border-color: #4611a7;
+        }
+
+    </style>
 
     <div class="page-wraper">
         <!-- 상단 제목부분 -->

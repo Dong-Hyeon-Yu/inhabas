@@ -92,7 +92,7 @@ def total_member_list(request):
             "exist_user_list": exist_user_items,
             "total_exist_users": len(exist_user_list),
             "new_user_list": new_user_items,
-            "total_new_users": len(new_user_items),
+            "total_new_users": len(new_user_list),
             "user_update_request_list": user_update_request_items,
             "user_delete_list": user_delete_list,
             "role_list": role_list,
@@ -126,7 +126,7 @@ def exist_member_list(request):
         else:
             exist_user_list = _get_exist_member_list(user)
 
-        exist_user_items = get_paginator_list(request, "exist_user", exist_user_list, 20)
+        exist_user_items = get_paginator_list(request, "exist_user", exist_user_list, 15)
 
         # 필터 적용을 위한 옵션 가져오기
         auth_list, role_list = _get_auth_list_or_role_list(user)
@@ -151,14 +151,14 @@ def new_member_list(request):
         if keyword := request.GET.get("keyword", None):  # 검색 요청일 경우
             new_user_list = new_user_list.filter(Q(user_stu__icontains=keyword) | Q(user_name__icontains=keyword))
 
-        new_user_items = get_paginator_list(request, "new_user", new_user_list, 20)
+        new_user_items = get_paginator_list(request, "new_user", new_user_list, 15)
 
         # 필터 적용을 위한 옵션 가져오기
         auth_list, role_list = _get_auth_list_or_role_list(user)
 
         context = {
             "new_user_list": new_user_items,
-            "total_new_users": len(new_user_items),
+            "total_new_users": len(new_user_list),
             "role_list": role_list,
             "auth_list": auth_list,
         }
