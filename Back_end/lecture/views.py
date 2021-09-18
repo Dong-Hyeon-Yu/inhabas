@@ -50,10 +50,10 @@ def get_lect_list(request, type_no):
 
         for lect in lect_list:
             # 마감일이 지났거나, 인원이 가득 차면 True
-            if is_closed(lect):  
+            if is_closed(lect):
                 lect_list_expired.append(lect)  # 마감 리스트에 추가
             # 그렇지 않은 경우, 즉 모집중인 경우
-            else:  
+            else:
                 lect_list_recruiting.append(lect)  # 모집 리스트에 추가
 
         lect_list_recruiting.extend(lect_list_expired)  # 모집 리스트와 마감 리스트를 합침
@@ -222,9 +222,13 @@ def lect_search(request, type_no):
     keyword = request.GET.get("keyword")
     lect_type = get_lect_type(request, type_no)
     # 기존 리스트에 검색 필터 추가 (검색 범위: 강의 제목, 강의 계획, 강의 소개)
-    lect_list = get_page_object(request, get_lect_list(request, type_no).filter(
-        Q(lect_intro__icontains=keyword) | Q(lect_title__icontains=keyword) | Q(
-            lect_chief__user_name__icontains=keyword)), num_of_boards_in_one_page=9)
+    lect_list = get_page_object(
+        request=request,
+        model_list=Lect.objects.filter(lect_type_id=type_no) \
+                                .filter(Q(lect_intro__icontains=keyword) |
+                                        Q(lect_title__icontains=keyword) |
+                                        Q(lect_chief__user_name__icontains=keyword)),
+        num_of_boards_in_one_page=9)
     lect_type.type_exp = "\"" + keyword + "\"(으)로 검색한 결과입니다."
     context = {
         "type": lect_type,
