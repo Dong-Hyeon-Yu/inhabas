@@ -226,25 +226,25 @@ SUMMERNOTE_CONFIG = {
 SUMMERNOTE_THEME = 'bs3'
 
 # 로컬 개발 시 쿼리 확인 용
-if os.getenv('env') not in ['production', 'dev']:
-    LOGGING = {
-        'version': 1,
-        'filters': {
-            'require_debug_true': {
-                '()': 'django.utils.log.RequireDebugTrue',
-            }
-        },
-        'handlers': {
-            'console': {
-                'level': 'DEBUG',
-                'filters': ['require_debug_true'],
-                'class': 'logging.StreamHandler',
-            }
-        },
-        'loggers': {
-            'django.db.backends': {
-                'level': 'DEBUG',
-                'handlers': ['console'],
-            }
-        }
-    }
+# if os.getenv('env') not in ['production', 'dev']:
+#     LOGGING = {
+#         'version': 1,
+#         'filters': {
+#             'require_debug_true': {
+#                 '()': 'django.utils.log.RequireDebugTrue',
+#             }
+#         },
+#         'handlers': {
+#             'console': {
+#                 'level': 'DEBUG',
+#                 'filters': ['require_debug_true'],
+#                 'class': 'logging.StreamHandler',
+#             }
+#         },
+#         'loggers': {
+#             'django.db.backends': {
+#                 'level': 'DEBUG',
+#                 'handlers': ['console'],
+#             }
+#         }
+#     }

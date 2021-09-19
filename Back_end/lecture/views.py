@@ -385,7 +385,7 @@ def lect_board_register(request, room_no, board_type):
                 lecture = lect_board_form.save(  # 공지 또는 강의 게시물 저장
                     lect_board_writer=get_logined_user(request),
                     lect_no=Lect.objects.get(pk=room_no),
-                    lect_board_ref_id=request.POST.get('lect_board_ref')  # 과제글에 대한 셀프조인
+                    lect_board_ref=request.POST.get('lect_board_ref', None)  # 과제글에 대한 셀프조인
                 )
                 file_form.save(instance=lecture)  # 공지 또는 강의 파일 저장
 
@@ -687,9 +687,8 @@ def lect_room_manage_member(request, room_no):
         } for stu, attend in zip(students, total_attend_info)]  # 하나의 딕셔너리로 묶기
 
         context = {
-            'attend_info_list': attend_info_list,  # 출석 정보 알아내기
             'lect': Lect.objects.get(pk=room_no),
-            'item_list': get_page_object(request, students, 15),  # 15 명씩 보이게 출력
+            'attend_info_list': get_page_object(request, attend_info_list, 25),  # 25 명씩 보이게 출력
             'total_check': len(lectures)
         }
 
@@ -746,7 +745,7 @@ def lect_room_manage_assignment(request, room_no):
 
     elif request.method == "POST":
         manage_mode = int(request.POST.get('manage_mode'))
-        if manage_mode in [-1, 1]:
+        if manage_mode in [-1, 0, 1]:
             checked_list = [request.POST[key] for key in request.POST if 'is_checked_' in key and request.POST[key]]
             assignments = LectAssignmentSubmit.objects.filter(pk__in=checked_list)
             for s in assignments:

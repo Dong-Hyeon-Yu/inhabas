@@ -1,4 +1,13 @@
 *config/
 *log/
 *media/
-*.static_root/
+/.idea/.gitignore
+/.idea/inhabas.com.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml
+/ibas_dev
+/무제.ppk
+/IBAS.sql

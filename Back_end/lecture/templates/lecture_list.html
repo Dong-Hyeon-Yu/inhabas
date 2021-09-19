@@ -2,11 +2,32 @@
 {% load static %}
 {% block content %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/posting_list.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/size.css' %}">
     <link
             rel="stylesheet"
             type="text/css"
             href="{% static 'css/posting_list.css' %}"
     />
+    <script>
+
+    window.onload = function () {
+        {# 게시글 최 상단 div를 가리킴 #}
+        var lectNum = document.getElementsByClassName("lectNum").length
+
+        {# 게시글 개수만큼 for문을 돌림 #}
+        for (let i = 0; i < lectNum; i++) {
+
+            var lectTitle = document.getElementsByClassName("lectTitle")[i].innerHTML
+            {# 게시글 제목이 25보다 길면 ...붙임 #}
+            if (lectTitle.length >= 25) {
+                lectTitle =  lectTitle.substr(0, 25) + "...";
+                return document.getElementsByClassName("lectTitle")[i].innerHTML = lectTitle
+            }
+
+        }
+    }
+    </script>
+
     <div class="page-wraper">
         <!-- 상단 제목부분 -->
         <div class="page-content bg-white">
@@ -37,7 +58,7 @@
 {#                        <div class="listing-filter m-b40">#}
                         <div class="d-flex justify-content-end m-b60">
                             <!-- 검색창용 form 태그 -->
-                            <form action="{% url 'lect_search' type_no=type.type_no %}" method="get">
+                            <form action="{% url 'lect_search' type_no=type.type_no %}" method="get" class="width-310">
                                 <div class="input-group">
                                     <!-- 필터바(해당 게시글만 보이게하는 것 구현 진행중 - 커밍쑨) -->
 {#                                    <div class="m-r15">#}
@@ -83,7 +104,7 @@
                             {% endif %}
                             {% for lect in item_list %}
                                 <!-- 게시글 1 -->
-                                <div class="col-lg-4 col-md-6 col-sm-6 m-b30">
+                                <div class="col-lg-4 col-md-6 col-sm-6 m-b30 lectNum">
                                     <div class="listing-bx event-listing m-b10">
                                         <!-- 게시글 대표 이미지 -->
                                         <!-- 이미지를 클릭하면, 해당 게시글로 이동함 -->
@@ -95,7 +116,7 @@
                                         <div class="listing-info" style="height: 110px">
                                             <!-- 강의, 스터디, 취미 제목 -->
                                             <!-- 제목 클릭 시, 해당 게시글로 이동 -->
-                                            <h3 class="title"><a
+                                            <h3 class="title"><a class="lectTitle"
                                                     href="{% url 'lect_detail' lect_no=lect.lect_no %}">{{ lect.lect_title }}</a>
                                             </h3>
                                             <!-- 강의, 스터디, 취미 간단소개 -->

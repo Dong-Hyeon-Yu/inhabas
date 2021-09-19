@@ -77,9 +77,19 @@
 
                                     <!--============================== 게시글 본문 시작 ==============================-->
                                     <div class="dlab-post-text">
+                                        <!--=======================유튜브 링크============================-->
+                                        {% if youtube %}
+                                            {% autoescape off %}
+                                                {{ youtube }}
+                                            {% endautoescape %}
+                                        {% endif %}
+                                        <!--=======================유튜브 링크============================-->
+
+                                        <!--======================= 본문 ============================-->
                                         {% autoescape off %}
                                             {{ board.lect_board_cont }}
                                         {% endautoescape %}
+                                        <!--======================= 본문 ============================-->
 
                                         <!-- 코드 뷰 -->
                                         {% for code_file in code_files %}
@@ -92,13 +102,10 @@
                                         {% include "file_detail.html" %}
 
                                         <!--=======================강의 링크============================-->
-                                        {% if youtube %}
-                                            {% autoescape off %}
-                                                {{ youtube }}
-                                            {% endautoescape %}
-                                        {% elif og %}
+
+                                        {% if not youtube and og  %}
                                             <div class="clear m-t50 category-bx" id="comment-list">
-                                                <a href="{{ og.url }}" class="comments-area" id="comments"
+                                                <a href="{{ board.lect_board_link }}" class="comments-area" id="comments"
                                                    target="_blank">
                                                     <div class="clearfix">
                                                         <ol class="comment-list">
@@ -130,7 +137,7 @@
                                                     </div>
                                                 </a>
                                             </div>
-                                        {% elif board.lect_board_link %}
+                                        {% elif not youtube and board.lect_board_link %}
                                             강의링크 :<a href="{{ board.lect_board_link }}"
                                                      target="_blank">{{ board.lect_board_link|url }}</a>
                                         {% endif %}
