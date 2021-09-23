@@ -385,7 +385,7 @@ def lect_board_register(request, room_no, board_type):
                 lecture = lect_board_form.save(  # 공지 또는 강의 게시물 저장
                     lect_board_writer=get_logined_user(request),
                     lect_no=Lect.objects.get(pk=room_no),
-                    lect_board_ref_id=request.POST.get('lect_board_ref')  # 과제글에 대한 셀프조인
+                    lect_board_ref=request.POST.get('lect_board_ref', None)  # 과제글에 대한 셀프조인
                 )
                 file_form.save(instance=lecture)  # 공지 또는 강의 파일 저장
 

@@ -217,7 +217,7 @@ class LectAssignmentForm(LectBoardFormBase):
                 message=_('강의자가 과제 등록 시에는, 과제를 등록할 강의를 설정해야합니다!')
             )
         else:
-            super().save(**kwargs)
+            return super().save(**kwargs)
 
 
 # 타입에 맞는 강의 게시글 폼
