@@ -149,7 +149,7 @@ class LectBoardFormBase(forms.ModelForm):
         lect_board = super().save(commit=False)
         lect_board.lect_board_writer = kwargs.get('lect_board_writer')
         lect_board.lect_no = kwargs.get('lect_no')
-        lect_board.lect_board_ref_id = kwargs.get('lect_board_ref_id', None)
+        lect_board.lect_board_ref_id = kwargs.get('lect_board_ref', None)
 
         if self.has_changed():
             lect_board.save()
