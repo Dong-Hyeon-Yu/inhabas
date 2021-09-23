@@ -81,12 +81,12 @@ def personal_info(string, request, lect):
 @register.simple_tag
 def get_GET_url(full_path, param, value):
     l, r = full_path.find('?'), full_path.find('=')
-    print(param)
+
     if l == -1:
         return full_path + "?" + param + "=" + str(value)
 
     while l < r:
-        print(l, r)
+
         if full_path[l + 1:r] == param:
             if full_path[r:].find('&') == -1:
                 return full_path[:r] + "=" + str(value)
