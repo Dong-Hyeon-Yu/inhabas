@@ -140,7 +140,7 @@
                                         {% for board in board_list %}
                                             <tr>
                                                 <!-- 게시글 번호 -->
-                                                <th scope="row">{{ board.pk }}</th>
+                                                <th scope="row">{% table_row_index board_list forloop.counter0 %}</th>
                                                 <!-- 게시글 제목 -->
                                                 <!-- 게시글 제목 클릭 시 해당 게시글의 상세 페이지로 이동하며, 제목을 a태크 처리함 -->
                                                 <td>
