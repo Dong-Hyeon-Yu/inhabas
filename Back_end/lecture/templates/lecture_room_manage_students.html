@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load table_tags %}
 {% load custom_tags %}
 {% load static %}
 {% block content %}
@@ -123,7 +124,7 @@
 
                                                         </td>
                                                         <!--수강생 번호-->
-                                                        <th>{{ forloop.counter }}</th>
+                                                        <th>{% table_row_index attend_info_list forloop.counter0 %}</th>
                                                         <!-- 회원 이름 -->
                                                         <td>{% personal_info info.enrolled.student.user_name request lect %}</td>
                                                         <!-- 회원 학번 -->
@@ -175,7 +176,7 @@
 
                                             <!--========== 페이지네이션 시작 ===========-->
                                             <!-- 1페이지에 수강생 끌고오고, 수강생이 그보다 적으면, 페이지네이션 안보이게 처리 -->
-                                            {% if item_list %}
+                                            {% if attend_info_list %}
                                                 {% include "pagination.html" %}
                                             {% endif %}
                                             <!--========== 페이지네이션 끝 ===========-->

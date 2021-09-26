@@ -687,9 +687,8 @@ def lect_room_manage_member(request, room_no):
         } for stu, attend in zip(students, total_attend_info)]  # 하나의 딕셔너리로 묶기
 
         context = {
-            'attend_info_list': attend_info_list,  # 출석 정보 알아내기
             'lect': Lect.objects.get(pk=room_no),
-            'item_list': get_page_object(request, students, 15),  # 15 명씩 보이게 출력
+            'attend_info_list': get_page_object(request, attend_info_list, 25),  # 25 명씩 보이게 출력
             'total_check': len(lectures)
         }
 
