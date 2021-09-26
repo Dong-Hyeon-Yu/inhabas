@@ -11,7 +11,7 @@ def url_https(url):
 
 
 def is_youtube(url):
-    if 'https://www.youtube.com/' in url:
+    if 'https://www.youtube.com/' in url or 'https://youtu.be/':
         return True
     else:
         return False
