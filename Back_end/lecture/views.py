@@ -745,7 +745,7 @@ def lect_room_manage_assignment(request, room_no):
 
     elif request.method == "POST":
         manage_mode = int(request.POST.get('manage_mode'))
-        if manage_mode in [-1, 1]:
+        if manage_mode in [-1, 0, 1]:
             checked_list = [request.POST[key] for key in request.POST if 'is_checked_' in key and request.POST[key]]
             assignments = LectAssignmentSubmit.objects.filter(pk__in=checked_list)
             for s in assignments:
