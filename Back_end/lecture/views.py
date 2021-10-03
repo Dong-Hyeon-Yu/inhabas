@@ -737,7 +737,7 @@ def lect_room_manage_assignment(request, room_no):
         context = {
             'lect': lect_room,
             'cur_assignment': None if assignment_no is None else LectBoard.objects.get(pk=assignment_no),
-            'students_list': students_list,
+            'students_list': get_page_object(request, students_list, 25),
             'lect_board_list': lect_room.lectures.filter(lect_board_type_id=2),
         }
 
@@ -803,7 +803,7 @@ def lect_room_manage_attendance(request, room_no):
                         enrollment.LECT_NO = {lect_room.lect_no} 
                         and u.USER_MAJOR = MAJOR_INFO.MAJOR_NO
 
-                    ORDER BY u.USER_NAME ;"""
+                    ORDER BY u.USER_STU ;"""
             cursor = connection.cursor()
             cursor.execute(query)  # 쿼리 수행
             students_list = [{
@@ -819,7 +819,7 @@ def lect_room_manage_attendance(request, room_no):
             'lect': lect_room,
             'lect_board_list': lect_board_list,
             'cur_lect_board': None if lect_board_no is None else LectBoard.objects.get(pk=lect_board_no),  # 현재 게시글
-            'students_list': get_page_object(request, students_list, 15),  # 15 명씩 보이게 출력
+            'students_list': get_page_object(request, students_list, 25),  # 25 명씩 보이게 출력
         }
         return render(request, 'lecture_room_manage_attendance.html', context)
 
