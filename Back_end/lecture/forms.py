@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -218,6 +220,11 @@ class LectAssignmentForm(LectBoardFormBase):
             )
         else:
             return super().save(**kwargs)
+
+    def clean_assignment_deadline(self):
+        deadline = self.cleaned_data['assignment_deadline']
+        deadline = deadline + timedelta(hours=23, minutes=59, seconds=59)
+        return deadline
 
 
 # 타입에 맞는 강의 게시글 폼
