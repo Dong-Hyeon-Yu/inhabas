@@ -354,7 +354,9 @@ function StatusFormSubmit() {
         alert('적용할 수강 상태를 선택하세요!');
     } else {
         let status_mode_str = '';
-        if (status_mode === '1') status_mode_str = '수강중';
+
+        if (status_mode === '-1') status_mode_str = '영구 퇴출';
+        else if (status_mode === '1') status_mode_str = '수강중';
         else status_mode_str = '수강정지';
 
         let checked_list = [];
@@ -365,11 +367,22 @@ function StatusFormSubmit() {
         if (checked_list.length === 0) {
             alert('적용할 수강생을 선택하세요!');
         } else {
-            if (confirm("총 " + checked_list.length + "명의 수강생을 " + status_mode_str + " 처리 하시겠습니까?")) {
-                const status_form = $("#status-form")
-                status_form.attr("method", "post");
-                return true;
+            let msg = "총 " + checked_list.length + "명의 수강생을 " + status_mode_str + " 처리 하시겠습니까?\n";
+
+            if (status_mode_str === '영구 퇴출') {
+                msg += "해당 수강생에 대한 모든 정보가 삭제되고, 복구 불가합니다. \n\n삭제하시려면 \"pi = 3.141592\"를 입력하세요!";
+                if(prompt(msg) === "pi = 3.141592"){
+                    const status_form = $("#status-form")
+                    status_form.attr("method", "post");
+                    return true;
+                }
             }
+            else
+                if (confirm(msg)) {
+                    const status_form = $("#status-form")
+                    status_form.attr("method", "post");
+                    return true;
+                }
         }
     }
 

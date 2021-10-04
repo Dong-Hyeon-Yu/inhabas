@@ -203,10 +203,10 @@ def create_user_activate_alarm(user: User):
         )
 
 
-# 강의에서 퇴출당할 경우
+# 강의에서 탈주할 경우
 def create_user_lect_out_alarm(lect_enrollment: LectEnrollment):
     Alarm.objects.create(
         alarm_user=lect_enrollment.student,
-        alarm_cont=f"{lect_enrollment.lect_no.lect_chief.user_name}(강의자)님에 의해 \"{lect_enrollment.lect_no.lect_title}\" 강의에서 퇴출되었습니다.",
+        alarm_cont=f"\"{lect_enrollment.lect_no.lect_title}\" 에서 나가셨습니다.",
         alarm_link=resolve_url("index")
     )
