@@ -695,10 +695,10 @@ def lect_room_manage_member(request, room_no):
         return render(request, 'lecture_room_manage_students.html', context)
 
     elif request.method == "POST":
-        if request.POST.get('status_mode') in ['0', '1']:
-            status_mode = int(request.POST.get('status_mode'))
+        status_mode = int(request.POST.get('status_mode'))
+        if status_mode in [0, 1]:
             checked_list = [request.POST[key] for key in request.POST if 'is_checked_' in key]  # 체크된 수강생들 pk 값 받아오기
-            students = LectEnrollment.objects.filter(pk__in=checked_list)  # 체크된 수강생들 쿼리 ORM
+            students = LectEnrollment.objects.filter(pk__in=checked_list, lect_no_id=room_no)  # 체크된 수강생들 쿼리 ORM
 
             for std in students:
                 std.status_id = status_mode
@@ -706,6 +706,15 @@ def lect_room_manage_member(request, room_no):
             LectEnrollment.objects.bulk_update(
                 objs=students, fields=['status', ]
             )
+
+        elif status_mode == -1:
+            checked_list = [request.POST[key] for key in request.POST if 'is_checked_' in key]  # 체크된 수강생들 pk 값 받아오기
+            enrollments = LectEnrollment.objects.filter(pk__in=checked_list, lect_no_id=room_no)
+
+            students = [row.student for row in enrollments]
+            LectAttendance.objects.filter(student__in=students, lect_no_id=room_no).delete()  # 출석 정보
+            LectAssignmentSubmit.objects.filter(assignment_submitter__in=students, lect_no_id=room_no).delete()  # 과제 정보
+            enrollments.delete()  # 강의 수강생 명단에서 제외
 
         return redirect(reverse('lect_room_manage_member', args=[room_no]))
 
