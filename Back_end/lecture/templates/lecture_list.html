@@ -12,19 +12,21 @@
 
     window.onload = function () {
         {# 게시글 최 상단 div를 가리킴 #}
-        var lectNum = document.getElementsByClassName("lectNum").length
+        var lectNum = document.getElementsByClassName("lectTitle").length;
 
         {# 게시글 개수만큼 for문을 돌림 #}
-        for (let i = 0; i < lectNum; i++) {
+        for (var i = 0; i < lectNum; i++) {
 
-            var lectTitle = document.getElementsByClassName("lectTitle")[i].innerHTML
-            {# 게시글 제목이 25보다 길면 ...붙임 #}
-            if (lectTitle.length >= 25) {
-                lectTitle =  lectTitle.substr(0, 25) + "...";
-                return document.getElementsByClassName("lectTitle")[i].innerHTML = lectTitle
+            var lectTitle = document.getElementsByClassName("lectTitle")[i].innerHTML;
+            console.log(lectTitle.length);
+            {# 게시글 제목이 23보다 길면 ...붙임 #}
+            if (lectTitle.length >= 23) {
+                lectTitle =  lectTitle.substr(0, 23) + "...";
+                document.getElementsByClassName("lectTitle")[i].innerHTML = lectTitle
             }
 
         }
+
     }
     </script>
 
@@ -116,7 +118,7 @@
                                         <div class="listing-info" style="height: 110px">
                                             <!-- 강의, 스터디, 취미 제목 -->
                                             <!-- 제목 클릭 시, 해당 게시글로 이동 -->
-                                            <h3 class="title"><a class="lectTitle"
+                                            <h3 class="title" style="max-width: 380px; max-height: 25px; overflow: hidden"><a class="lectTitle"
                                                     href="{% url 'lect_detail' lect_no=lect.lect_no %}">{{ lect.lect_title }}</a>
                                             </h3>
                                             <!-- 강의, 스터디, 취미 간단소개 -->
