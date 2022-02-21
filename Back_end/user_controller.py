@@ -147,7 +147,10 @@ def role_check(cur_user, role_no, sign="equal"):
 
 # 유저 관련 객체를 반환하는 컨트롤러
 def get_logined_user(request):  # 로그인한 유저 객체 반환
-    return User.objects.get(pk=request.session.get("user_stu"))
+    if request.session.get("user_stu") is not None:
+        return User.objects.get(pk=request.session.get("user_stu"))
+    else:
+        return None
 
 
 # 학번을 넣어서 조회할 경우
