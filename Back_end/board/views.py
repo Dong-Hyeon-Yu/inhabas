@@ -10,7 +10,7 @@ from user_controller import login_required, writer_only, auth_check, get_logined
     superuser_only
 from django.contrib import messages
 from date_controller import today_after_day, today_after_year, today
-from exception_handler import exist_check
+from exception_handler import exist_check, get_error_message
 from post_controller import comment_delete_by_post_delete
 
 
@@ -28,9 +28,12 @@ def get_fixdate(request):
 # 등록 버튼을 표시할 지, 말지 고르는 함수
 def is_register_btn_show(request, board_type_no):
     cur_user = get_logined_user(request)
+    if cur_user is None:  # 로그인하지 않은 유저
+        return False
+
     auth_no = cur_user.user_auth.auth_no
 
-    if board_type_no == 1:  # 공지사항
+    if board_type_no in (1, 10):  # 공지사항 & 공개게시판
         if role_check(cur_user, 5, "lte"):  # 회장단 or 교수인가?
             return True
     elif board_type_no < 5:  # 자유게시판, 질문게시판, 활동게시판
@@ -124,6 +127,18 @@ def get_context_of_contest_(contest_no):
     return context
 
 
+# ---- board_view_wrapper ---- #
+# : 게시글 목록 페이지
+# 작성자 : 유동현
+# 마지막 수정 일시 : 2021-02-21
+# 공개자료실과 다른 로그인이 필요한 게시판을 분리하기 위한 wrapper
+def board_view_wrapper(request, board_type_no):
+    if board_type_no == 10: # 공개자료실인 경우는 모두 접근가능.
+        return archive_view(request, board_type_no)
+    else:
+        return board_view(request, board_type_no)
+
+
 # ---- board_view ---- #
 # : 게시글 목록 페이지
 # 작성자 : 양태영
@@ -169,6 +184,26 @@ def board_view(request, board_type_no):  # 게시판 페이지로 이동
     }
     context.update(get_sidebar_information())
 
+    return render(request, 'board.html', context)
+
+
+# ---- archive_view ---- #
+# : 공개자료실 목록 페이지
+# 작성자 : 유동현
+# 마지막 수정 일시 : 2021-02-21
+# 외부인에게 열려있는 공개 자료실을 위한 로직.
+def archive_view(request, board_type_no):
+
+    board_list = Board.objects.filter(board_type_no_id=board_type_no).select_related(
+        "board_writer").order_by("-board_created")
+    board_list = get_page_object(request, board_list)
+    context = {
+        "board_list": board_list,
+        "board_name": BoardType.objects.get(pk=board_type_no).board_type_name,
+        "board_exp": BoardType.objects.get(pk=board_type_no).board_type_exp,
+        "board_type_no": board_type_no,
+        "is_register_btn_show": is_register_btn_show(request, board_type_no)
+    }
     return render(request, 'board.html', context)
 
 
@@ -224,6 +259,18 @@ def board_search(request, board_type_no):
         return redirect('board_view', board_type_no=5)
 
 
+# ---- detail_view_wrapper ---- #
+# : 게시글 상세보기를 로그인 필요한 로직과 구분하기 위함.
+# 작성자 : 유동현
+# 마지막 수정 일시 : 2022.02.21
+def detail_view_wrapper(request, board_no):
+    board = Board.objects.get(pk=board_no)
+    if board.board_type_no_id == 10:  # 공개자료실
+        return archive_detail(request, board_no)
+    else:  # 로그인 필요한 게시판
+        return board_detail(request, board_no)
+
+
 # ---- board_detail ---- #
 # : 게시글 상세 페이지
 # 작성자 : 양태영
@@ -249,13 +296,31 @@ def board_detail(request, board_no):  # 게시글 상세 보기
     return render(request, 'board_detail.html', context)
 
 
+# ---- archive_detail ---- #
+# : 공개게시판 상세페이지
+# 작성자 : 유동현
+# 마지막 수정 일시 : 2022.02.21
+def archive_detail(request, board_no):
+
+    try:
+        Board.objects.get(pk=board_no)
+    except Board.DoesNotExist:
+        get_error_message(request)
+        return redirect("index")
+
+    context = get_context_of_board_(board_no)
+    return render(request, 'board_detail.html', context)
+
+
 # ---- board_register ---- #
 # : 게시글 등록부
 # 작성자 : 양태영
 # 수정 일시 : #1. 2021.04.30 (유동현),
 #            #2. 2021.07.22 (양태영)
+#            #3. 2022.02.21 (유동현)
 # 수정내용 : #1. 모델 폼 적용에 따른 코드 수정
 #           #2. 상단 고정 변수 추가
+#           #3. 공개게시판 추가
 @auth_check()
 def board_register(request):
     cur_user = get_logined_user(request)
@@ -279,13 +344,19 @@ def board_register(request):
 
     else:  # 게시글 등록 버튼을 눌렀을 때
         board_type_no = BoardType.objects.get(pk=request.GET.get('board_type_no'))
-        if board_type_no.board_type_no == 1 and not role_check(cur_user, 5,
-                                                               "lte"):  # 공지사항 게시판에서 글쓰기 버튼을 눌렀을 경우 회장단이 아니면
+
+        # 공지사항 게시판과 공개게시판에서 글쓰기 버튼을 눌렀을 경우 회장단 또는 교수가 아니면
+        if board_type_no.board_type_no in (1, 10) and not role_check(cur_user, 5, "lte"):
             return not_allowed(request, "비 정상적인 접근입니다.")
+
+        # 알파테스터 베타테스터인 경우 회장이 아니면
         if 6 <= board_type_no.board_type_no <= 7 and cur_user.user_auth_id != 1:
             return not_allowed(request)
-        if board_type_no.board_type_no == 8 and not role_check(cur_user, 4, "lte"):  # 회장단 게시판에서 글쓰기 버튼을 눌렀을 경우 회장단이 아니면
+
+        # 회장단 게시판에서 글쓰기 버튼을 눌렀을 경우 회장단이 아니면
+        if board_type_no.board_type_no == 8 and not role_check(cur_user, 4, "lte"):
             return not_allowed(request, "비 정상적인 접근입니다.")
+
         context = {
             "board_form": BoardForm(initial={'board_type_no': board_type_no.board_type_no}),
             "file_form": FileForm(),
