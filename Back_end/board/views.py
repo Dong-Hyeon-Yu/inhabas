@@ -207,6 +207,16 @@ def archive_view(request, board_type_no):
     return render(request, 'board.html', context)
 
 
+# ---- search_wrapper ---- #
+# : 로그인이 필요한 검색과, 그렇지 않은 경우를 구분하기 위함.
+# 작성자 : 유동현
+def search_wrapper(request, board_type_no):
+    if board_type_no == 10:  # 공개 자료실 검색
+        return archive_search(request, board_type_no)
+    else:
+        return board_search(request, board_type_no)
+
+
 # ---- board_search ---- #
 # : 게시글 검색
 # 작성자 : 양태영
@@ -257,6 +267,31 @@ def board_search(request, board_type_no):
         return render(request, "board.html", context)
     else:
         return redirect('board_view', board_type_no=5)
+
+
+def archive_search(request, board_type_no):
+    if request.method == "GET":
+        keyword = request.GET.get("keyword")
+        board_list = Board.objects.\
+            filter(
+                Q(board_cont__icontains=keyword) |
+                Q(board_title__icontains=keyword) |
+                Q(board_writer__user_name__icontains=keyword))\
+            .filter(board_type_no_id=board_type_no)\
+            .select_related("board_writer")\
+            .order_by("-board_created")\
+            .all()
+
+        item = get_page_object(request, board_list)
+        context = {
+            "message": "\"" + keyword + "\"로 검색한 게시글이 존재하지 않습니다.",
+            "board_list": item,
+            'board_type_no': board_type_no,
+            "board_name": "검색결과",
+            "board_exp": "\"" + keyword + "\"로 검색한 결과입니다.",
+        }
+
+        return render(request, "board.html", context)
 
 
 # ---- detail_view_wrapper ---- #
