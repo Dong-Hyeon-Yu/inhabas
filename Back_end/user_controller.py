@@ -35,7 +35,6 @@ def get_social_login_info(password):
     auth_user = AuthUser.objects.filter(password=password).first()
     # 있다면 social account에서 앞서서 Auth의 primary key를 통해 가입한 친구의 pk를 넣어서 조회
     tar_member = SocialAccount.objects.filter(user_id=auth_user.id).first()  # quesyset의 첫번째 자료. 즉 로그인한 인원의 인스턴스 변수
-    tar_token = SocialToken.objects.filter(account_id=tar_member.id).first()
     social_login_info_dict = dict()
 
     # extra_data: 사용자의 동의를 통해 로그인 출처로 부터 얻은 사용자의 개인정보
@@ -47,11 +46,6 @@ def get_social_login_info(password):
     elif social_login_info_dict["provider"] == "naver":  # 사용자가 네이버를 통해 로그인 한 경우
         social_login_info_dict["pic"] = tar_member.extra_data.get(
             'profile_image')  # extra_data 테이블에서 꺼내는 변수를 profile_image로 설정
-
-    # 소셜 로그인으로 부터 받은 정보는 저장하지 않기 위해 해당 정보 삭제
-    tar_token.delete()
-    tar_member.delete()
-    auth_user.delete()
 
     return social_login_info_dict
 
