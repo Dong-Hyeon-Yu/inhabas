@@ -8,7 +8,7 @@ from user_controller import not_allowed
 
 # 오늘을 출력 양식에 맞추어 반환
 def today():
-    return str(DateFormat(datetime.now()).format("Y-m-d h:i:s"))
+    return str(DateFormat(datetime.now()).format("Y-m-d H:i:s"))
 
 
 # 오늘 datetime 객체를 반환.
