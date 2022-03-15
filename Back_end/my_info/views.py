@@ -192,9 +192,12 @@ def connect_social_account(request):
 
                 messages.warning(request, "정상적으로 이메일 연동이 완료되었습니다.")
 
+        except AttributeError:
+            messages.warning(request, "소셜로그인 필수 동의 항목 값을 불러올 수 없습니다. 소셜 계정에서 관련 설정을 변경해주세요!")
+            return redirect(reverse("index"))
+
         except BadSignature or User.DoesNotExist:
             messages.warning(request, "데이터가 손상되었습니다. 다시 시도해주세요!")
-
             return redirect(reverse("index"))
 
         except AuthUser.DoesNotExist or SocialAccount.DoesNotExist:

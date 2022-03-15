@@ -30,6 +30,12 @@ def get_real_name(name_str: str):
     return real_name
 
 
+# util
+def check_required_consent_fields(social_dict):
+    if social_dict["email"] is None:
+        raise AttributeError('no email')
+
+
 def get_social_login_info(password):
 
     auth_user = AuthUser.objects.get(password=password)
@@ -45,6 +51,8 @@ def get_social_login_info(password):
         social_login_info_dict["pic"] = social_account.extra_data.get('picture')
     elif social_login_info_dict["provider"] == "naver":
         social_login_info_dict["pic"] = social_account.extra_data.get('profile_image')
+
+    check_required_consent_fields(social_login_info_dict)
 
     return social_login_info_dict
 

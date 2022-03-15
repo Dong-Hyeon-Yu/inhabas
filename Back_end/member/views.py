@@ -61,7 +61,6 @@ def choose_std_or_pro(request):  # 학생인지, 교수인지 고르는 페이�
         social_dict = None
         try:
             social_dict = get_social_login_info(user_token)
-            check_required_consent_fields(social_dict)
 
             user_social_account = UserSocialAccount.objects.select_related("user") \
                 .get(uid=social_dict.get("uid"), provider=social_dict.get("provider"))
