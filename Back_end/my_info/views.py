@@ -1,10 +1,11 @@
-import json
 import os
 
+from allauth.socialaccount.models import SocialAccount
+from django.core.signing import Signer, BadSignature
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, reverse
-from DB.models import Board, User, Comment, Bank, UserUpdateRequest, UserEmail, StateInfo, MajorInfo, Lect, \
-    LectEnrollment, BoardType
+from DB.models import Board, User, Comment, Bank, UserUpdateRequest, StateInfo, MajorInfo, Lect, \
+    LectEnrollment, UserSocialAccount, AuthUser
 from django.db.models import Q
 
 from alarm.alarm_controller import create_user_activate_alarm
@@ -16,11 +17,10 @@ from member.session import save_session
 import hashlib
 
 
-def get_ecrypt_value(value: str):
+def get_md5_hash_value(value: str):
     return hashlib.md5(value.encode()).hexdigest()
 
 
-# Create your views here.
 @login_required
 def my_info(request):  # 내 정보 출력
     my_comment_list = Comment.objects.filter(
@@ -40,12 +40,12 @@ def my_info(request):  # 내 정보 출력
             Q(updated_user=get_logined_user(request)) & Q(updated_state__state_no=1)),
         "my_update_request_list": UserUpdateRequest.objects.filter(updated_user=get_logined_user(request)),
         "my_bank_list": Bank.objects.filter(bank_used_user=get_logined_user(request)).order_by("-bank_used"),
-        "user_list": User.objects.all(),
+        # "user_list": User.objects.all(),
         "major_list": MajorInfo.objects.all(),
         "is_naver_existed": len(
-            UserEmail.objects.filter(Q(user_stu=get_logined_user(request)) & Q(provider="naver"))) != 0,
+            UserSocialAccount.objects.filter(Q(user=get_logined_user(request)) & Q(provider="naver"))) != 0,
         "is_google_existed": len(
-            UserEmail.objects.filter(Q(user_stu=get_logined_user(request)) & Q(provider="google"))) != 0,
+            UserSocialAccount.objects.filter(Q(user=get_logined_user(request)) & Q(provider="google"))) != 0,
     }
     return render(request, 'my_info.html', context)
 
@@ -140,13 +140,20 @@ def user_phone_update(request):
         return redirect(reverse("index"))
 
 
+waiting_queue_for_adding_social_account = dict()  # in-memory storage for user id
+
+
 # 연동시 파라미터를 남기기 위한 코드 (GET 방식이기 때문에 보안에 매우 취약함.)
 def go_social_login_before_setting(request):
     if request.method == "POST":
-        encoded_user_stu = get_ecrypt_value(str(get_logined_user(request).user_stu))
+
+        current_user_id = str(get_logined_user(request).user_stu)
+        user_signature = Signer().signature(current_user_id)
+        waiting_queue_for_adding_social_account[user_signature] = current_user_id
+
         context = {
             "provider": request.POST.get("provider"),
-            "next_url": "/user/pass?user_stu=" + encoded_user_stu,
+            "next_url": f"/user/pass?user_stu={user_signature}",
         }
         return render(request, "go_social_login.html", context)
     return redirect(reverse("index"))
@@ -154,28 +161,52 @@ def go_social_login_before_setting(request):
 
 # login_required를 설정하지 말 것. 연동시 로그인이 잠시 풀리기 때문.
 def connect_social_account(request):
-    if request.method == "POST":
-        social_dict = get_social_login_info(request.POST.get("password"))
-        target_user_stu = request.POST.get("user_stu")
-        current_user = None
-        for user in User.objects.all():
-            if target_user_stu == get_ecrypt_value(str(user.user_stu)):
-                current_user = user
-                break
 
-        if current_user is not None:
-            if len(UserEmail.objects.filter(user_email=social_dict.get("email"))) == 0:
-                UserEmail.objects.create(user_stu=current_user, user_email=social_dict.get("email"),
-                                         provider=social_dict.get("provider"))
-                save_session(request, user_model=current_user, logined_email=social_dict.get("email"),
-                             provider=social_dict.get("provider"))
-                messages.warning(request, "정상적으로 이메일 연동이 완료되었습니다.")
-                return redirect(reverse("my_info"))
-            else:
-                messages.warning(request, "이미 해당 이메일로 등록되어 있습니다.")
-    else:
+    if request.method != "POST":
         messages.warning(request, "비 정상적인 접근입니다.")
-    return redirect(reverse("index"))
+
+        return redirect(reverse("index"))
+
+    else:
+        user_signature = request.POST.get("user_stu")
+        current_user_id = waiting_queue_for_adding_social_account[user_signature]
+        waiting_queue_for_adding_social_account.pop(user_signature, None)
+
+        current_user, social_dict = None, None
+        try:
+            signer = Signer()
+            signer.unsign(f"{current_user_id}:{user_signature}")  # verify credential
+
+            current_user = User.objects.get(user_stu=current_user_id)
+            social_dict = get_social_login_info(request.POST.get("password"))
+
+            if UserSocialAccount.objects\
+                    .filter(uid=social_dict.get("uid"), provider=social_dict.get("provider")).count():
+                messages.warning(request, "이미 해당 이메일로 등록되어 있습니다.")
+
+            else:
+                UserSocialAccount.objects.create(user=current_user,
+                                                 email=social_dict.get("email"),
+                                                 provider=social_dict.get("provider"),
+                                                 uid=social_dict.get("uid"))
+
+                messages.warning(request, "정상적으로 이메일 연동이 완료되었습니다.")
+
+        except BadSignature or User.DoesNotExist:
+            messages.warning(request, "데이터가 손상되었습니다. 다시 시도해주세요!")
+
+            return redirect(reverse("index"))
+
+        except AuthUser.DoesNotExist or SocialAccount.DoesNotExist:
+            messages.warning(request, "해당 계정 인증에 실패했습니다! 다시 시도해주세요!")
+
+        finally:
+            save_session(request,
+                         user_model=current_user,
+                         logined_email=social_dict.get("email"),
+                         provider=social_dict.get("provider"))
+
+    return redirect(reverse("my_info"))
 
 
 # 회원 탈퇴 시 실행되는 함수,.

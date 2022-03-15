@@ -1,5 +1,5 @@
-{% load socialaccount %} <!-- 소셜 로그인 user를 받기 위해 사용-->
-{% providers_media_js %} <!-- 소셜 미디어 로그인 페이지와 로그아웃 페이지를 따기 위해 사용 -->
+{#{% load socialaccount %} <!-- 소셜 로그인 user를 받기 위해 사용-->#}
+{#{% providers_media_js %} <!-- 소셜 미디어 로그인 페이지와 로그아웃 페이지를 따기 위해 사용 -->#}
 {% load static %}
 <script src="{% static 'js/httpController.js' %}"></script>
 {% if user.password is None %} <!-- google 로그인 페이지로부터 넘어온 게 없으면, 즉, 로그인을 하지 않은 상태라면 -->

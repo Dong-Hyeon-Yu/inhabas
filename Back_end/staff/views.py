@@ -1,7 +1,7 @@
 from django.shortcuts import render, reverse, redirect, get_object_or_404
 from DB.models import User, UserRole, UserAuth, Answer, UserUpdateRequest, \
     UserDelete, UserDeleteAor, UserDeleteFile, UserDeleteState, \
-    UserEmail, StateInfo, LectSchedule, LectMoneyStandard, UserSchedule, PolicyTerms  # 전체 계정 DB, AuthUser 테이블을 사용하기 위함.
+    StateInfo, LectSchedule, LectMoneyStandard, UserSchedule, PolicyTerms, UserSocialAccount
 from staff.forms import UserDeleteForm, UserScheduleForm, LectScheduleForm, LectMoneyStandardForm, PolicyTermsForms
 from pagination_handler import get_page_object
 from IBAS.forms import FileFormBase
@@ -24,10 +24,8 @@ from exception_handler import exist_check
 
 # 모델에 따른 이메일 리스트를 불러오는 함수
 def get_email_list(user_model):
-    user_email_list = list()
-    for user_email in UserEmail.objects.filter(user_stu=user_model):
-        user_email_list.append(user_email.user_email)
-    return user_email_list
+
+    return [social_account.email for social_account in UserSocialAccount.objects.filter(user=user_model)]
 
 
 def _get_exist_member_list(cur_user):

@@ -122,7 +122,7 @@
 
                         <!-- 회원 가입 입력 폼 시작 -->
                         <form id="join-form" action="
-                                {% if user_role == "6" %}{% url 'join_chk' %}{% else %}{% url 'quest_chk' %}{% endif %}"
+                                {% if user_role == "student" %}{% url 'join_chk' %}{% else %}{% url 'quest_chk' %}{% endif %}"
                               method="post">
                             <!-- 회원 가입 확인 함수:join_chk()로 전송 -->
                             <!--POST전송을 위한 CSRF 토큰-->
@@ -130,10 +130,10 @@
                             <!-- 바로 사용하지 못하는 것들은 사전 설정함. -->
                             <!--사전 설정-->
                             <input type="hidden" id="user_token" name="user_token" value="{{ token }}"/>
-                            <input type="hidden" id="user_auth" name="user_auth" value="3"/> <!-- 계정을 비활성화 시킴 -->
                             <!-- 기본 권한 -->
                             <input type="hidden" id="user_role" name="user_role" value="{{ user_role }}"/>
                             <input type="hidden" id="provider" name="provider" value="{{ provider }}"/>
+                            <input type="hidden" id="uid" name="uid" value="{{ uid }}"/>
                             <input type="hidden" id="is_activated" name="is_activated" value="0"/>
                             <!-- 승인 전까지는 대기하도록 0으로 설정 -->
                             <input type="hidden" id="user_pic" name="user_pic" value="{{ pic }}">
@@ -218,12 +218,12 @@
                                                     name="user_stu"
                                                     class="form-control"
                                                     required="required"
-                                                    {% if user_role == "6" %}
-                                                    placeholder="학번(12112233)"
-                                                    maxlength="8"
-                                                    {% else %}
+                                                    {% if user_role == "professor" %}
                                                     placeholder="교수번호"
                                                     maxlength="6"
+                                                    {% else %}
+                                                    placeholder="학번(12112233)"
+                                                    maxlength="8"
                                                     {% endif %}
                                                     oninput="maxLengthCheck(this)"
                                                     onfocusout="stu_check_for_join()"
