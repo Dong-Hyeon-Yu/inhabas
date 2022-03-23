@@ -80,9 +80,6 @@ def total_member_list(request):
         user_update_request_list = UserUpdateRequest.objects.filter(updated_state_id=1)
         user_update_request_items = get_paginator_list(request, "request", user_update_request_list, 3)
 
-        # 제명 리스트 받아오기 (최신 상위 5개만)
-        user_delete_list = UserDelete.objects.all().order_by("-user_delete_created")[:5]
-
         # 필터 적용을 위한 옵션 가져오기
         auth_list, role_list = _get_auth_list_or_role_list(user)
 
@@ -92,7 +89,6 @@ def total_member_list(request):
             "new_user_list": new_user_items,
             "total_new_users": len(new_user_list),
             "user_update_request_list": user_update_request_items,
-            "user_delete_list": user_delete_list,
             "role_list": role_list,
             "auth_list": auth_list,
         }

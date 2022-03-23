@@ -140,7 +140,10 @@
                                                         scope="col">
                                                         역할
                                                     </th>
-                                                    <th class="border-top-0 width-100 min-width-100"></th>
+                                                    <th class="border-top-0 width-100 min-width-100 text-center"
+                                                        scope="col">
+                                                        기수
+                                                    </th>
                                                 </tr>
                                                 </thead>
                                                 <!-- 댓글 내용 테이블 -->
@@ -181,19 +184,22 @@
                                                         <td class="text-center">
                                                             {{ exist_user.user_role.role_name }}
                                                         </td>
-                                                        <!-- 제명건의 -->
+{#                                                        <!-- 제명건의 -->#}
+{#                                                        <td class="text-center">#}
+{#                                                            {% if exist_user.user_role.role_no != 5 %}#}
+{#                                                                {% if exist_user.is_going_to_delete %}#}
+{#                                                                    <a class="m-0"#}
+{#                                                                       href="{% url "member_delete_detail" user_delete_no=exist_user.delete_no %}"#}
+{#                                                                       style="font-size: 12px; font-weight: bold; color: #dc3545 "#}
+{#                                                                    >제명진행중</a>#}
+{#                                                                {% else %}#}
+{#                                                                    <a href="{% url "member_delete_register" deleted_user=exist_user.user_stu %}"#}
+{#                                                                       style="font-size: 12px; font-weight: bold">제명건의</a>#}
+{#                                                                {% endif %}#}
+{#                                                            {% endif %}#}
+{#                                                        </td>#}
                                                         <td class="text-center">
-                                                            {% if exist_user.user_role.role_no != 5 %}
-                                                                {% if exist_user.is_going_to_delete %}
-                                                                    <a class="m-0"
-                                                                       href="{% url "member_delete_detail" user_delete_no=exist_user.delete_no %}"
-                                                                       style="font-size: 12px; font-weight: bold; color: #dc3545 "
-                                                                    >제명진행중</a>
-                                                                {% else %}
-                                                                    <a href="{% url "member_delete_register" deleted_user=exist_user.user_stu %}"
-                                                                       style="font-size: 12px; font-weight: bold">제명건의</a>
-                                                                {% endif %}
-                                                            {% endif %}
+                                                            {{ exist_user.user_gen }}기
                                                         </td>
                                                     </tr>
                                                 {% endfor %}

@@ -299,7 +299,10 @@
                                                         scope="col">
                                                         역할
                                                     </th>
-                                                    <th class="border-top-0 width-100 min-width-100"></th>
+                                                    <th class="border-top-0 width-100 min-width-100 text-center"
+                                                        scope="col">
+                                                        기수
+                                                    </th>
                                                 </tr>
                                                 </thead>
                                                 <!-- 댓글 내용 테이블 -->
@@ -340,19 +343,23 @@
                                                         <td class="text-center">
                                                             {{ exist_user.user_role.role_name }}
                                                         </td>
-                                                        <!-- 제명건의 -->
+{#                                                        <!-- 제명건의 -->#}
+{#                                                        <td class="text-center">#}
+{#                                                            {% if exist_user.user_role.role_no != 5 %}#}
+{#                                                                {% if exist_user.is_going_to_delete %}#}
+{#                                                                    <a class="m-0"#}
+{#                                                                       href="{% url "member_delete_detail" user_delete_no=exist_user.delete_no %}"#}
+{#                                                                       style="font-size: 12px; font-weight: bold; color: #dc3545 "#}
+{#                                                                    >제명진행중</a>#}
+{#                                                                {% else %}#}
+{#                                                                    <a href="{% url "member_delete_register" deleted_user=exist_user.user_stu %}"#}
+{#                                                                       style="font-size: 12px; font-weight: bold">제명건의</a>#}
+{#                                                                {% endif %}#}
+{#                                                            {% endif %}#}
+{#                                                        </td>#}
+                                                        <!-- 기수 -->
                                                         <td class="text-center">
-                                                            {% if exist_user.user_role.role_no != 5 %}
-                                                                {% if exist_user.is_going_to_delete %}
-                                                                    <a class="m-0"
-                                                                       href="{% url "member_delete_detail" user_delete_no=exist_user.delete_no %}"
-                                                                       style="font-size: 12px; font-weight: bold; color: #dc3545 "
-                                                                    >제명진행중</a>
-                                                                {% else %}
-                                                                    <a href="{% url "member_delete_register" deleted_user=exist_user.user_stu %}"
-                                                                       style="font-size: 12px; font-weight: bold">제명건의</a>
-                                                                {% endif %}
-                                                            {% endif %}
+                                                            {{ exist_user.user_gen }}기
                                                         </td>
                                                     </tr>
                                                 {% endfor %}
@@ -487,82 +494,82 @@
 
 
                         <!-- 제명 콘텐츠 시작 -->
-                        <div class="content-box">
-                            <div class="content-header d-flex justify-content-between">
-                                <h3 class="title"><i class="la la-sign-out m-r5"></i>제명안건 관리</h3>
-                                {% if user_delete_list %}
-                                    <a href="{% url 'member_delete_list' %}" class="font-12">더보기</a>{% endif %}
-                            </div>
-
-                            <!-- 요청사항 실질 콘텐츠 시작 -->
-
-                            {% csrf_token %}
-                            <div class="content-body">
-                                <div class="myinfo-table-padding">
-                                    <!-- 내용 테이블 -->
-                                    <table class="table">
-                                        <!-- 테이블 1행: 제목 -->
-                                        <thead>
-                                        <tr>
-                                            <!-- staff_width는 staff_yejin.css에 정의되어 있음.  -->
-                                            <th class="border-top-0 width-50 min-width-50"
-                                                scope="col"></th>
-                                            <th class="border-top-0 text-center"
-                                                scope="col">
-                                                제목
-                                            </th>
-                                            <th class="border-top-0 width-150 min-width-150 text-center"
-                                                scope="col">
-                                                제명 대상자
-                                            </th>
-                                            <th class="border-top-0 width-150 min-width-150 text-center"
-                                                scope="col">
-                                                안건 발안자
-                                            </th>
-                                            <th class="border-top-0 width-150 min-width-150 text-center"
-                                                scope="col">
-                                                안건 발안일
-                                            </th>
-                                            <th class="border-top-0 width-150 min-width-150 text-center" scope="col">
-                                            </th>
-                                        </tr>
-                                        </thead>
-                                        <!-- 내용 테이블 -->
-                                        <tbody>
-                                        <!-- ===========================여기부터 복붙============================== -->
-                                        {% if user_delete_list|length == 0 %}
-                                            <tr>
-                                                <td colspan="8" style="text-align: center">
-                                                    제명 논의 중인 회원이 없습니다.
-                                                </td>
-                                            </tr>
-                                        {% else %}
-                                            {% for user_delete in user_delete_list %}
-                                                <tr>
-                                                    <th>{{ forloop.counter }}</th>
-                                                    <!-- 회원 제목 -->
-                                                    <td class="text-center">{{ user_delete.user_delete_title }}</td>
-                                                    <!-- 제명대상 -->
-                                                    <td class="text-center">{{ user_delete.deleted_user.user_name }}</td>
-                                                    <!-- 안건발안자 -->
-                                                    <td class="text-center">{{ user_delete.suggest_user.user_name }}</td>
-                                                    <!-- 안건발안일 -->
-                                                    <td class="text-center">
-                                                        {{ user_delete.user_delete_created|date:"Y-m-d" }}</td>
-                                                    <!-- 제명안건 바로가기 -->
-                                                    <td class="text-center">
-                                                        <a href="{% url 'member_delete_detail' user_delete_no=user_delete.user_delete_no %}">안건
-                                                            바로가기</a>
-                                                    </td>
-                                                </tr>
-                                            {% endfor %}
-                                        {% endif %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                        </div>
+{#                        <div class="content-box">#}
+{#                            <div class="content-header d-flex justify-content-between">#}
+{#                                <h3 class="title"><i class="la la-sign-out m-r5"></i>제명안건 관리</h3>#}
+{#                                {% if user_delete_list %}#}
+{#                                    <a href="{% url 'member_delete_list' %}" class="font-12">더보기</a>{% endif %}#}
+{#                            </div>#}
+{##}
+{#                            <!-- 요청사항 실질 콘텐츠 시작 -->#}
+{##}
+{#                            {% csrf_token %}#}
+{#                            <div class="content-body">#}
+{#                                <div class="myinfo-table-padding">#}
+{#                                    <!-- 내용 테이블 -->#}
+{#                                    <table class="table">#}
+{#                                        <!-- 테이블 1행: 제목 -->#}
+{#                                        <thead>#}
+{#                                        <tr>#}
+{#                                            <!-- staff_width는 staff_yejin.css에 정의되어 있음.  -->#}
+{#                                            <th class="border-top-0 width-50 min-width-50"#}
+{#                                                scope="col"></th>#}
+{#                                            <th class="border-top-0 text-center"#}
+{#                                                scope="col">#}
+{#                                                제목#}
+{#                                            </th>#}
+{#                                            <th class="border-top-0 width-150 min-width-150 text-center"#}
+{#                                                scope="col">#}
+{#                                                제명 대상자#}
+{#                                            </th>#}
+{#                                            <th class="border-top-0 width-150 min-width-150 text-center"#}
+{#                                                scope="col">#}
+{#                                                안건 발안자#}
+{#                                            </th>#}
+{#                                            <th class="border-top-0 width-150 min-width-150 text-center"#}
+{#                                                scope="col">#}
+{#                                                안건 발안일#}
+{#                                            </th>#}
+{#                                            <th class="border-top-0 width-150 min-width-150 text-center" scope="col">#}
+{#                                            </th>#}
+{#                                        </tr>#}
+{#                                        </thead>#}
+{#                                        <!-- 내용 테이블 -->#}
+{#                                        <tbody>#}
+{#                                        <!-- ===========================여기부터 복붙============================== -->#}
+{#                                        {% if user_delete_list|length == 0 %}#}
+{#                                            <tr>#}
+{#                                                <td colspan="8" style="text-align: center">#}
+{#                                                    제명 논의 중인 회원이 없습니다.#}
+{#                                                </td>#}
+{#                                            </tr>#}
+{#                                        {% else %}#}
+{#                                            {% for user_delete in user_delete_list %}#}
+{#                                                <tr>#}
+{#                                                    <th>{{ forloop.counter }}</th>#}
+{#                                                    <!-- 회원 제목 -->#}
+{#                                                    <td class="text-center">{{ user_delete.user_delete_title }}</td>#}
+{#                                                    <!-- 제명대상 -->#}
+{#                                                    <td class="text-center">{{ user_delete.deleted_user.user_name }}</td>#}
+{#                                                    <!-- 안건발안자 -->#}
+{#                                                    <td class="text-center">{{ user_delete.suggest_user.user_name }}</td>#}
+{#                                                    <!-- 안건발안일 -->#}
+{#                                                    <td class="text-center">#}
+{#                                                        {{ user_delete.user_delete_created|date:"Y-m-d" }}</td>#}
+{#                                                    <!-- 제명안건 바로가기 -->#}
+{#                                                    <td class="text-center">#}
+{#                                                        <a href="{% url 'member_delete_detail' user_delete_no=user_delete.user_delete_no %}">안건#}
+{#                                                            바로가기</a>#}
+{#                                                    </td>#}
+{#                                                </tr>#}
+{#                                            {% endfor %}#}
+{#                                        {% endif %}#}
+{#                                        </tbody>#}
+{#                                    </table>#}
+{#                                </div>#}
+{#                            </div>#}
+{##}
+{#                        </div>#}
 
                     </div>
                 </div>
