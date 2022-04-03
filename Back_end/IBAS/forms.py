@@ -6,7 +6,7 @@ class FileFormBase(forms.Form):
         required=False,
         widget=forms.FileInput(
             attrs={'multiple': True,
-                   'accept': ".xlsx,.xls,image/*,.doc,.docx,video/*,.ppt,.pptx,.txt,.pdf,.py,.java,.zip"})
+                   'accept': ".xlsx,.xls,image/*,.doc,.docx,video/*,.ppt,.pptx,.txt,.pdf,.py,.java,.zip,.csv"})
     )
 
     """
