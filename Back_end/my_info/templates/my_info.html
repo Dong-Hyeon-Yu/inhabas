@@ -11,6 +11,7 @@
     <script src="{% static 'js/form.js' %}"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="{% static 'js/validation_check.js' %}"></script>
+    <script src="{% static 'js/lecture_title_limit.js' %}"></script>
 
     <!-- Content -->
     <div class="page-content bg-white text-gray-1">
@@ -155,8 +156,8 @@
                                                             <div class="listing-info" style="height: 110px">
                                                                 <!-- 강의제목 -->
                                                                 <!-- 제목 클릭 시, 해당 게시글로 이동 -->
-                                                                <h3 class="title"><a
-                                                                        href="{% url 'lect_room_main' room_no=my_lect_ing.lect_no.lect_no %}">{{ my_lect_ing.lect_no.lect_title }}</a>
+                                                                <h3 class="title"><a class="lectTitle"
+                                                                                     href="{% url 'lect_room_main' room_no=my_lect_ing.lect_no.lect_no %}">{{ my_lect_ing.lect_no.lect_title }}</a>
                                                                 </h3>
                                                                 <!-- 강의 간단소개 -->
                                                                 <ul class="event-meta">
@@ -167,14 +168,17 @@
                                                                         <span class="text-primary">{{ my_lect_ing.lect_no.lect_deadline|date:"m" }}월</span>
                                                                         <!-- 강의 시작일 -->
                                                                         <!-- 강의 모집 마감일이 아니라 시작일을 가져와야 함 -->
-                                                                        <strong>{{ my_lect_ing.lect_no.lect_deadline|date:"d" }}</strong>
+                                                                        <strong>
+                                                                            {{ my_lect_ing.lect_no.lect_deadline|date:"d" }}</strong>
+
+
                                                                         {% if my_lect_ing.lect_state.state_no == 4 %}
-                                                                            <span class="recruiting-end">완 강</span>
+                                                                            <span class="recruiting-wait">종료</span>
                                                                         {% elif my_lect_ing.lect_state.state_no == 3 %}
                                                                             {% if my_lect_ing.is_expired %}
-                                                                                <span class="recruiting-ing">진행중</span>
+                                                                                <span class="recruiting-ing">진행</span>
                                                                             {% else %}
-                                                                                <span class="recruiting">모집중</span>
+                                                                                <span class="recruiting">모집</span>
                                                                             {% endif %}
                                                                         {% endif %}
                                                                     </li>
@@ -183,6 +187,7 @@
                                                                     </li>
                                                                 </ul>
                                                             </div>
+
                                                             <div class="event-bottom">
                                                                 <ul>
                                                                     <!-- 강의 요일, 장소, 인원 li-->
@@ -191,11 +196,36 @@
                                                                         <span class="text-primary mr-3">요일</span>
                                                                         <!-- 강의에 해당하는 요일을 DB에서 가져와야 함 -->
                                                                         <span>{{ my_lect_ing.lect_no.lect_day }}</span>
+
+                                                                    </li>
+                                                                    <li class="event-hosted">
                                                                         <!-- 강의 진행방식 Zoom 혹은 강의실 호수 -->
-                                                                        <span class="text-primary mr-3 m-l30"><i
-                                                                                class="ti-location-pin"></i></span>
                                                                         <!-- 강의 진행방식을 DB에서 가져와야 함 -->
-                                                                        <span>{{ my_lect_ing.lect_no.lect_method.method_name }}</span>
+                                                                        {#                                                                        <span>{{ my_lect_ing.lect_no.lect_method.method_name }}</span>#}
+                                                                        {% if my_lect_ing.lect_type_id != 3 %}
+
+                                                                            <!-- 강의 진행방식을 DB에서 가져와야 함 -->
+                                                                            {#오프라인일 경우 장소를 그대로 가져오고, 오프라인이 아닐 경우 진행 방식이름을 대신 노출.#}
+
+                                                                            {% if my_lect_ing.lect_method_id == 1 %}
+                                                                                <span class="recruiting-wait m-r10">오프라인</span>
+
+                                                                            {% elif my_lect_ing.lect_method_id == 2 %}
+                                                                                <span class="recruiting-wait m-r10">온라인</span>
+
+                                                                            {% elif my_lect_ing.lect_method_id == 2 %}
+                                                                                <span class="recruiting-wait m-r10">온라인</span>
+
+                                                                            {% elif my_lect_ing.lect_method_id == 3 %}
+                                                                                <span class="recruiting-wait m-r10">온라인</span>
+
+                                                                            {% else %}
+                                                                                <span class="recruiting-wait m-r10">기타</span>
+                                                                            {% endif %}
+                                                                        {% endif %}
+                                                                    </li>
+
+
                                                                 </ul>
                                                             </div>
                                                         </div>
@@ -250,7 +280,8 @@
                                                                 <!-- 강의제목 -->
                                                                 <!-- 제목 클릭 시, 해당 게시글로 이동 -->
                                                                 <h3 class="title">
-                                                                    <a href="{% url 'lect_room_main' room_no=my_lect_fin.lect_no.lect_no %}">{{ my_lect_fin.lect_no.lect_title }}</a>
+                                                                    <a class="lectTitle"
+                                                                       href="{% url 'lect_room_main' room_no=my_lect_fin.lect_no.lect_no %}">{{ my_lect_fin.lect_no.lect_title }}</a>
                                                                 </h3>
                                                                 <!-- 강의 간단소개 -->
                                                                 <ul class="event-meta">
@@ -261,14 +292,15 @@
                                                                         <span class="text-primary">{{ my_lect_fin.lect_no.lect_deadline|date:"m" }}월</span>
                                                                         <!-- 강의 시작일 -->
                                                                         <!-- 강의 모집 마감일이 아니라 시작일을 가져와야 함 -->
-                                                                        <strong>{{ my_lect_fin.lect_no.lect_deadline|date:"d" }}</strong>
+                                                                        <strong>
+                                                                            {{ my_lect_fin.lect_no.lect_deadline|date:"d" }}</strong>
                                                                         {% if my_lect_fin.lect_state.state_no == 4 %}
-                                                                            <span class="recruiting-end">완 강</span>
+                                                                            <span class="recruiting-wait">종료</span>
                                                                         {% elif my_lect_fin.lect_state.state_no == 3 %}
                                                                             {% if my_lect_fin.is_expired %}
-                                                                                <span class="recruiting-ing">진행중</span>
+                                                                                <span class="recruiting-ing">진행</span>
                                                                             {% else %}
-                                                                                <span class="recruiting">모집중</span>
+                                                                                <span class="recruiting">모집</span>
                                                                             {% endif %}
                                                                         {% endif %}
                                                                     </li>
@@ -285,11 +317,33 @@
                                                                         <span class="text-primary mr-3">요일</span>
                                                                         <!-- 강의에 해당하는 요일을 DB에서 가져와야 함 -->
                                                                         <span>{{ my_lect_fin.lect_no.lect_day }}</span>
+
+                                                                    </li>
+                                                                    <li class="event-hosted">
                                                                         <!-- 강의 진행방식 Zoom 혹은 강의실 호수 -->
-                                                                        <span class="text-primary mr-3 m-l30"><i
-                                                                                class="ti-location-pin"></i></span>
                                                                         <!-- 강의 진행방식을 DB에서 가져와야 함 -->
-                                                                        <span>{{ my_lect_fin.lect_no.lect_method.method_name }}</span>
+                                                                        <!-- 강의 진행방식을 DB에서 가져와야 함 -->
+                                                                        {#                                                                        <span>{{ my_lect_made.lect_method.method_name }}</span>#}
+
+                                                                            {% if my_lect_made.lect_type_id != 3 %}
+
+                                                                                <!-- 강의 진행방식을 DB에서 가져와야 함 -->
+                                                                                {#오프라인일 경우 장소를 그대로 가져오고, 오프라인이 아닐 경우 진행 방식이름을 대신 노출.#}
+
+                                                                                {% if my_lect_fin.lect_no.lect_method_id == 1 %}
+                                                                                    <span class="recruiting-wait m-r10">오프라인</span>
+
+                                                                                {% elif my_lect_fin.lect_no.lect_method_id == 2 %}
+                                                                                    <span class="recruiting-wait m-r10">온라인</span>
+
+                                                                                {% elif my_lect_fin.lect_no.lect_method_id == 3 %}
+                                                                                    <span class="recruiting-wait m-r10">온라인</span>
+
+                                                                                {% else %}
+                                                                                    <span class="recruiting-wait m-r10">기타</span>
+                                                                                {% endif %}
+                                                                            {% endif %}
+
                                                                     </li>
                                                                 </ul>
                                                             </div>
@@ -347,7 +401,8 @@
                                                                 <!-- 강의제목 -->
                                                                 <!-- 제목 클릭 시, 해당 게시글로 이동 -->
                                                                 <h3 class="title">
-                                                                    <a href="{% url 'lect_room_main' room_no=my_lect_made.lect_no %}">{{ my_lect_made.lect_title }}</a>
+                                                                    <a class="lectTitle"
+                                                                       href="{% url 'lect_room_main' room_no=my_lect_made.lect_no %}">{{ my_lect_made.lect_title }}</a>
                                                                 </h3>
                                                                 <!-- 강의 간단소개 -->
                                                                 <ul class="event-meta">
@@ -358,19 +413,21 @@
                                                                         <span class="text-primary">{{ my_lect_made.lect_deadline|date:"m" }}월</span>
                                                                         <!-- 강의 시작일 -->
                                                                         <!-- 강의 모집 마감일이 아니라 시작일을 가져와야 함 -->
-                                                                        <strong>{{ my_lect_made.lect_deadline|date:"d" }}</strong>
+                                                                        <strong>
+                                                                            {{ my_lect_made.lect_deadline|date:"d" }}</strong>
+
                                                                         {% if my_lect_made.lect_state.state_no == 4 %}
-                                                                            <span class="recruiting-end">종 강</span>
+                                                                            <span class="recruiting-wait">종료</span>
                                                                         {% elif my_lect_made.lect_state.state_no == 3 %}
                                                                             {% if my_lect_made.is_expired %}
-                                                                                <span class="recruiting-ing">진행중</span>
+                                                                                <span class="recruiting-ing">진행</span>
                                                                             {% else %}
-                                                                                <span class="recruiting">모집중</span>
+                                                                                <span class="recruiting">모집</span>
                                                                             {% endif %}
                                                                         {% elif my_lect_made.lect_state.state_no == 2 %}
-                                                                            <span class="recruiting-end">거절됨</span>
+                                                                            <span class="recruiting-end">거절</span>
                                                                         {% else %}
-                                                                            <span class="recruiting-wait">대기중</span>
+                                                                            <span class="recruiting-wait">대기</span>
                                                                         {% endif %}
 
 
@@ -388,11 +445,29 @@
                                                                         <span class="text-primary mr-3">요일</span>
                                                                         <!-- 강의에 해당하는 요일을 DB에서 가져와야 함 -->
                                                                         <span>{{ my_lect_made.lect_day }}</span>
+                                                                    </li>
+                                                                    <li class="event-hosted">
                                                                         <!-- 강의 진행방식 Zoom 혹은 강의실 호수 -->
-                                                                        <span class="text-primary mr-3 m-l30"><i
-                                                                                class="ti-location-pin"></i></span>
                                                                         <!-- 강의 진행방식을 DB에서 가져와야 함 -->
-                                                                        <span>{{ my_lect_made.lect_method.method_name }}</span>
+                                                                        {% if my_lect_made.lect_type_id != 3 %}
+
+                                                                            <!-- 강의 진행방식을 DB에서 가져와야 함 -->
+                                                                            {#오프라인일 경우 장소를 그대로 가져오고, 오프라인이 아닐 경우 진행 방식이름을 대신 노출.#}
+
+                                                                            {% if my_lect_made.lect_method_id == 1 %}
+                                                                                <span class="recruiting-wait m-r10">오프라인</span>
+
+                                                                            {% elif my_lect_made.lect_method_id == 2 %}
+                                                                                <span class="recruiting-wait m-r10">온라인</span>
+
+                                                                            {% elif my_lect_made.lect_method_id == 3 %}
+                                                                                <span class="recruiting-wait m-r10">온라인</span>
+
+                                                                            {% else %}
+                                                                                <span class="recruiting-wait m-r10">기타</span>
+                                                                            {% endif %}
+                                                                        {% endif %}
+
                                                                     </li>
                                                                 </ul>
                                                             </div>
@@ -415,7 +490,7 @@
                                 <div class="content-box">
                                     <!-- 내가 작성한 게시글 제목 -->
                                     <div class="content-header">
-                                        <h3 class="title"><i class="la la-file-text m-r5"></i> 내가 작성한 게시글</h3>
+                                        <h3 class="title"><i class="la la-file-text m-r5"></i> 내가 작성한 게시글 </h3>
                                     </div>
                                     <!-- 게시글 담는 div -->
                                     <div class="myinfo-table-padding">
@@ -857,7 +932,8 @@
                                             {% for my_update_request in my_update_request_list %}
                                                 <tr>
                                                     <!--신청 날짜 뜨는 부분, back : 신청일 뜨도록 수정-->
-                                                    <td style="text-align: center">{{ my_update_request.updated_date|date:"Y-m-d h:i" }}</td>
+                                                    <td style="text-align: center">
+                                                        {{ my_update_request.updated_date|date:"Y-m-d h:i" }}</td>
                                                     <!--기존 이름 뜨는 부분, back : 기존 이름 뜨도록 하고, 이름 변경되도 내역에는 남아있도록,,-->
                                                     <td style="text-align: center">{{ my_update_request.updated_user.user_name }}</td>
                                                     <!--새롭게 신청한 이름 뜨는 부분, back : 신청한 이름 뜨도록 하고, 이름 재수정시에 바뀌지 않고 그대로 있도록-->
@@ -1055,7 +1131,7 @@
                                     </div>
                                     <!--내용부분-->
                                     <div class="modal-body">
-                                        <form id="update-phone-number" class="dlab-form" >
+                                        <form id="update-phone-number" class="dlab-form">
                                             {% csrf_token %}
                                             <!--수정할 전화번호 입력창, Back : 입력하면 전화번호 중복체크 하도록 수정-->
                                             <div class="form-group pb-0 mb-1">
@@ -1069,7 +1145,8 @@
                                             <p id="error_text_phone" class="mx-auto font-10 m-0 p-0"
                                                style="color:red; display: none"></p>
                                             <input type="submit" class="site-button" style="width: 100%"
-                                                    onclick='return phone_check("{% url "user_phone_update" %}");' value="수정">
+                                                   onclick='return phone_check("{% url "user_phone_update" %}");'
+                                                   value="수정">
 
                                         </form>
                                     </div>
@@ -1113,7 +1190,8 @@
                                                 <!--설명 내용 수정 부분-->
                                                 <textarea name="user_intro" required="required"
                                                           class="form-control"
-                                                          placeholder="간단한 본인 소개를 적어주세요">{% if logined_user.user_intro %}{{ logined_user.user_intro }}{% endif %}</textarea>
+                                                          placeholder="간단한 본인 소개를 적어주세요">{% if logined_user.user_intro %}
+                                                    {{ logined_user.user_intro }}{% endif %}</textarea>
                                             </div>
                                             <!--수정신청하기 버튼, Back : 누르면 회장에게 승인을 요구하도록 수정-->
                                             <a href="#" class="site-button"
@@ -1169,8 +1247,6 @@
                             </div>
                         {% endif %}
                         <!-- Modal End -->
-
-
                     </div>
                 </div>
             </div>

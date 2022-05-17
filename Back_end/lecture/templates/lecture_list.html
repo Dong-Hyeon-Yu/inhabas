@@ -8,27 +8,8 @@
             type="text/css"
             href="{% static 'css/posting_list.css' %}"
     />
-    <script>
 
-    window.onload = function () {
-        {# 게시글 최 상단 div를 가리킴 #}
-        var lectNum = document.getElementsByClassName("lectTitle").length;
-
-        {# 게시글 개수만큼 for문을 돌림 #}
-        for (var i = 0; i < lectNum; i++) {
-
-            var lectTitle = document.getElementsByClassName("lectTitle")[i].innerHTML;
-            console.log(lectTitle.length);
-            {# 게시글 제목이 23보다 길면 ...붙임 #}
-            if (lectTitle.length >= 23) {
-                lectTitle =  lectTitle.substr(0, 23) + "...";
-                document.getElementsByClassName("lectTitle")[i].innerHTML = lectTitle
-            }
-
-        }
-
-    }
-    </script>
+    <script src="{% static 'js/lecture_title_limit.js' %}"></script>
 
     <div class="page-wraper">
         <!-- 상단 제목부분 -->
@@ -56,27 +37,27 @@
                 <div class="section-full content-inner bg-white">
                     <div class="container">
                         <!-- 검색창 및 진행중/마감 필터바 -->
-                    <!-- 및 div는 원래 사용하던 div임. 필터 구현시 사용할 것 -->
-{#                        <div class="listing-filter m-b40">#}
+                        <!-- 및 div는 원래 사용하던 div임. 필터 구현시 사용할 것 -->
+                        {#                        <div class="listing-filter m-b40">#}
                         <div class="d-flex justify-content-end m-b60">
                             <!-- 검색창용 form 태그 -->
                             <form action="{% url 'lect_search' type_no=type.type_no %}" method="get" class="width-310">
                                 <div class="input-group">
                                     <!-- 필터바(해당 게시글만 보이게하는 것 구현 진행중 - 커밍쑨) -->
-{#                                    <div class="m-r15">#}
-{#                                        <ul class="filter m-b0">#}
-{#                                            <li>#}
-{#                                                <select>#}
-{#                                                    <!-- 모든 게시글이 보이게 처리예정 -->#}
-{#                                                    <option>전체보기</option>#}
-{#                                                    <!-- 강의, 취미, 공모전 진행중인 게시글이 보이게 처리 -->#}
-{#                                                    <option>진행중</option>#}
-{#                                                    <!-- 강의, 취미, 공모전 마감된 게시글이 보이게 처리 -->#}
-{#                                                    <option>마감</option>#}
-{#                                                </select>#}
-{#                                            </li>#}
-{#                                        </ul>#}
-{#                                    </div>#}
+                                    {#                                    <div class="m-r15">#}
+                                    {#                                        <ul class="filter m-b0">#}
+                                    {#                                            <li>#}
+                                    {#                                                <select>#}
+                                    {#                                                    <!-- 모든 게시글이 보이게 처리예정 -->#}
+                                    {#                                                    <option>전체보기</option>#}
+                                    {#                                                    <!-- 강의, 취미, 공모전 진행중인 게시글이 보이게 처리 -->#}
+                                    {#                                                    <option>진행중</option>#}
+                                    {#                                                    <!-- 강의, 취미, 공모전 마감된 게시글이 보이게 처리 -->#}
+                                    {#                                                    <option>마감</option>#}
+                                    {#                                                </select>#}
+                                    {#                                            </li>#}
+                                    {#                                        </ul>#}
+                                    {#                                    </div>#}
                                     <!-- 검색창 div -->
                                     <div class="lect-search-bar">
                                         <!-- 검색창 input 태그 -->
@@ -118,7 +99,8 @@
                                         <div class="listing-info" style="height: 110px">
                                             <!-- 강의, 스터디, 취미 제목 -->
                                             <!-- 제목 클릭 시, 해당 게시글로 이동 -->
-                                            <h3 class="title" style="max-width: 380px; max-height: 25px; overflow: hidden"><a class="lectTitle"
+                                            <h3 class="title"><a
+                                                    class="lectTitle"
                                                     href="{% url 'lect_detail' lect_no=lect.lect_no %}">{{ lect.lect_title }}</a>
                                             </h3>
                                             <!-- 강의, 스터디, 취미 간단소개 -->
@@ -135,7 +117,7 @@
                                                     {% if lect.lect_state_id == 4 %}
                                                         <span class="recruiting-wait">종료</span>
                                                     {% elif lect.is_expired or lect.lect_limit_num <= lect.get_enrolled_std_num %}
-                                                        <span class="recruiting-end">마감</span>
+                                                        <span class="recruiting-ing">진행</span>
                                                     {% else %}
                                                         <span class="recruiting">모집</span>
                                                     {% endif %}
@@ -150,31 +132,49 @@
                                             <ul>
                                                 <!-- 강 요일, 장소, 인원 li-->
                                                 <li class="event-hosted">
-                                                    <!-- 강의를 정기적으로 진행하는 요일 -->
-                                                    <span class="text-primary mr-3">요일</span>
-
-                                                    <!-- 강의에 해당하는 요일을 DB에서 가져와야 함 -->
-                                                    <span>
-                                                        {{ lect.lect_day }}
-                                                    </span>
                                                     <!-- 강의 진행방식 Zoom 혹은 강의실 호수 -->
                                                     {% if lect.lect_type_id != 3 %}
-                                                        <span class="text-primary mr-2 ml-3"><i
-                                                                class="ti-location-pin"></i></span>
-                                                        <!-- 강의 진행방식을 DB에서 가져와야 함 -->
-                                                        {# 오프라인일 경우 장소를 그대로 가져오고, 오프라인이 아닐 경우 진행 방식이름을 대신 노출. #}
+                                                        <div class="d-inline-block width-65 font-weight-600">
+                                                            {#<span class="recruiting-wait m-r10">오프라인</span>#}
 
-                                                        {% if lect.lect_method_id == 1 %}
-                                                            <span>{{ lect.lect_place_or_link }}</span>
-                                                        {% else %}
-                                                            <span>{{ lect.lect_method.method_name }}</span>
-                                                        {% endif %}
+
+                                                            <!-- 강의 진행방식을 DB에서 가져와야 함 -->
+                                                            {#오프라인일 경우 장소를 그대로 가져오고, 오프라인이 아닐 경우 진행 방식이름을 대신 노출.#}
+
+                                                            {% if lect.lect_method_id == 1 %}
+                                                                <span class="recruiting-wait m-r10">오프라인</span>
+
+                                                            {% elif lect.lect_method_id == 2 %}
+                                                                <span class="recruiting-wait m-r10">온라인</span>
+
+                                                            {% elif lect.lect_method_id == 3 %}
+                                                                <span class="recruiting-wait m-r10">온라인</span>
+
+                                                            {% else %}
+                                                                <span class="recruiting-wait m-r10">기타</span>
+                                                            {% endif %}
+
+                                                        </div>
                                                     {% endif %}
+
+                                                    <div class="d-inline-block width-145">
+
+                                                        <!-- 강의를 정기적으로 진행하는 요일 -->
+
+                                                        <span class="text-primary mr-1 font-weight-600">요일</span>
+
+                                                        <!-- 강의에 해당하는 요일을 DB에서 가져와야 함 -->
+                                                        <span class="lectDay">{{ lect.lect_day }}</span>
+                                                    </div>
+
                                                     <!-- 수강 신청한 인원 및 제한 인원 -->
-                                                    <span class="text-primary mr-2 ml-3"><i
+                                                    <div class="d-inline-block">
+                                                    <span class="text-primary mr-1 ml-3"><i
                                                             class="fa fa-user"></i></span>
-                                                    <!-- 강의 신청자 및 총 정원을 DB에서 가져와야 함. -->
-                                                    <span>{{ lect.get_enrolled_std_num }} / {{ lect.lect_limit_num }} 명</span>
+                                                        <!-- 강의 신청자 및 총 정원을 DB에서 가져와야 함. -->
+                                                        <span>{{ lect.get_enrolled_std_num }} / {{ lect.lect_limit_num }} 명</span>
+                                                    </div>
+
                                                 </li>
                                             </ul>
                                         </div>
