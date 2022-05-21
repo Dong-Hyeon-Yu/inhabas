@@ -142,16 +142,16 @@
                                                             {#오프라인일 경우 장소를 그대로 가져오고, 오프라인이 아닐 경우 진행 방식이름을 대신 노출.#}
 
                                                             {% if lect.lect_method_id == 1 %}
-                                                                <span class="recruiting-wait m-r10">오프라인</span>
+                                                                <span class="recruiting-wait">오프라인</span>
 
                                                             {% elif lect.lect_method_id == 2 %}
-                                                                <span class="recruiting-wait m-r10">온라인</span>
+                                                                <span class="recruiting-wait">온라인</span>
 
                                                             {% elif lect.lect_method_id == 3 %}
-                                                                <span class="recruiting-wait m-r10">온라인</span>
+                                                                <span class="recruiting-wait">온라인</span>
 
                                                             {% else %}
-                                                                <span class="recruiting-wait m-r10">기타</span>
+                                                                <span class="recruiting-wait">기타</span>
                                                             {% endif %}
 
                                                         </div>
