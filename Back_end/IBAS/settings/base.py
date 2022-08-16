@@ -200,7 +200,7 @@ ACCOUNT_LOGOUT_ON_GET = True  # 로그 아웃 시 example.com사이트로 자동
 
 # send email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.googlemail.com'
+EMAIL_HOST = 'email-smtp.ap-northeast-2.amazonaws.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
