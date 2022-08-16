@@ -190,7 +190,7 @@
                                     <!-- 학년, 학번 컨테이너 -->
                                     <div class="form-container-flex form-group m-b0">
                                         <!--학년 컨테이너-->
-                                        {% if user_role == "6" %}
+                                        {% if user_role == "student" %}
                                             <div class="width-100">
                                                 <select id="user_grade" name="user_grade" required="required">
                                                     <option value="1">
@@ -232,7 +232,7 @@
                                         </div>
 
                                     </div>
-                                    <p id="error_text_stu" class="error-text">입력하신 {% if user_role == "6" %}
+                                    <p id="error_text_stu" class="error-text">입력하신 {% if user_role == "student" %}
                                         학번이{% else %}교수번호가{% endif %} 이미 가입되어 있습니다.</p>
                                     <!-- 전공 input -->
                                     <div class="form-container-flex form-group m-b0">
@@ -253,7 +253,7 @@
                                             <i class="fa fa-search fa-2x form-item-flex-major-icon search-btn"></i>
                                         </div>
                                     </div>
-                                    {% if user_role == "5" %}
+
                                         <!-- 체크 박스, 동의 문구 컨테이너 -->
                                         <div style="display: flex; flex-direction: column">
                                             <!-- 개인정보 제공 동의 컨테이너 -->
@@ -270,7 +270,7 @@
                                                 </label>
                                             </div>
                                         </div>
-                                    {% endif %}
+
 
                                     <!-- 입부신청 버튼 -->
                                     <div class="form-group mt-5 mb-5">
@@ -284,7 +284,7 @@
                     </div>
                 </div>
             </div>
-            {% if user_role == "5" %}
+            {% if user_role == "student" %}
                 {% include "policy_modal.html" with modal_id="policy_1" policy_terms=policy_type_1 %}
                 {% include "policy_modal.html" with modal_id="policy_2" policy_terms=policy_type_2 %}
                 {% include "policy_modal.html" with modal_id="policy_3" policy_terms=policy_type_3 %}
