@@ -2,6 +2,7 @@ from django.shortcuts import render, reverse, redirect, get_object_or_404
 from DB.models import User, UserRole, UserAuth, Answer, UserUpdateRequest, \
     UserDelete, UserDeleteAor, UserDeleteFile, UserDeleteState, \
     StateInfo, LectSchedule, LectMoneyStandard, UserSchedule, PolicyTerms, UserSocialAccount
+from IBAS.settings.base import DEFAULT_FROM_EMAIL
 from staff.forms import UserDeleteForm, UserScheduleForm, LectScheduleForm, LectMoneyStandardForm, PolicyTermsForms
 from pagination_handler import get_page_object
 from IBAS.forms import FileFormBase
@@ -257,7 +258,7 @@ def member_aor(request):
                 user.user_auth = UserAuth.objects.get(pk=2)
                 # 메일 전송
                 send_mail(subject=mail_dict["mail_title"], message=mail_dict["mail_message"],
-                          from_email=settings.EMAIL_HOST_USER, recipient_list=user_email_list)
+                          from_email=DEFAULT_FROM_EMAIL, recipient_list=user_email_list)
                 if user.user_role_id == 5:
                     user.user_auth = UserAuth.objects.get(pk=1)
                 user.save()
@@ -269,7 +270,7 @@ def member_aor(request):
                 if not is_default_pic(str(user.user_pic)):
                     FileController.delete_all_files_of_(user)
                 send_mail(subject=mail_dict["mail_title"], message=mail_dict["mail_message"],  # 메일 전송
-                          from_email=settings.EMAIL_HOST_USER,
+                          from_email=DEFAULT_FROM_EMAIL,
                           recipient_list=user_email_list)
                 user.delete()
         return redirect(reverse("staff_member_list"))
@@ -289,7 +290,7 @@ def members_aor(request):  # 여러명 일괄 처리시.
                         mail_dict = get_message(True, user.user_name)
                         user.user_auth = UserAuth.objects.get(pk=2)  # 비활동 회원으로 변경
                         send_mail(subject=mail_dict["mail_title"], message=mail_dict["mail_message"],  # 합격 메일 전송
-                                  from_email=settings.EMAIL_HOST_USER, recipient_list=get_email_list(user))
+                                  from_email=DEFAULT_FROM_EMAIL, recipient_list=get_email_list(user))
                         if user.user_role_id == 5:
                             user.user_auth = UserAuth.objects.get(pk=1)
                         user.save()
@@ -303,7 +304,7 @@ def members_aor(request):  # 여러명 일괄 처리시.
                         except FileNotFoundError:  # 파일이 존재하지 않은 경우
                             pass  # 넘어감.
                         send_mail(subject=mail_dict["mail_title"], message=mail_dict["mail_message"],  # 불합격 메일 전송
-                                  from_email=settings.EMAIL_HOST_USER, recipient_list=get_email_list(user))
+                                  from_email=DEFAULT_FROM_EMAIL, recipient_list=get_email_list(user))
                         user.delete()
         return redirect(reverse("staff_member_list"))  # 처리 완료 후.
     return redirect(reverse("index"))  # 비정상적인 요청의 경우.
