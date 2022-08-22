@@ -3,7 +3,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 import sentry_sdk
 
 sentry_sdk.init(
-    dsn="https://e0b7f7f1f8f04b39a633a223a86a8dca@o977207.ingest.sentry.io/5933669",
+    dsn="https://f51f9e76bd644fd3bb40b8c180ea4ac1@o1372531.ingest.sentry.io/6677587",
     integrations=[DjangoIntegration()],
     traces_sample_rate=1.0,
     #traces_sampler=traces_sampler,
@@ -13,7 +13,7 @@ sentry_sdk.init(
 
 
 ADMINS = [
-    ('Dong Hyeon Yu', 'ydh9516.dev@gmail.com'),
+    ('Yejin', 'yyj11kr@naver.com'),
 ]
 
 WSGI_APPLICATION = 'IBAS.wsgi.production.application'
