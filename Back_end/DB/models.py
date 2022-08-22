@@ -584,7 +584,7 @@ class UserDeleteState(models.Model):
 class UserEmail(models.Model):
     user_email = models.CharField(max_length=100, db_column="USER_EMAIL", primary_key=True)
     provider = models.CharField(max_length=20, db_column="PROVIDER")
-    user_stu = models.ForeignKey(User, on_delete=models.CASCADE, db_column='user_stu')
+    user_stu = models.ForeignKey(User, on_delete=models.CASCADE, db_column='user_stu', related_name="deprecated_email")
 
     class Meta:
         managed = False
@@ -593,14 +593,14 @@ class UserEmail(models.Model):
 
 class UserSocialAccount(models.Model):
     id = models.PositiveIntegerField(primary_key=True, editable=False, db_column="id")
-    email = models.CharField(max_length=100, db_column="USER_EMAIL")
+    user_email = models.CharField(max_length=100, db_column="USER_EMAIL")
     provider = models.CharField(max_length=20, db_column="PROVIDER")
     uid = models.CharField(max_length=191, db_column="UID")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, db_column='USER_STU')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_column='USER_STU', related_name='useremail_set')
 
     class Meta:
         managed = False
-        db_table = 'USER_SOCIALACCOUNT'
+        db_table = 'user_socialaccount'
         unique_together = (('provider', 'uid'),)
 
 
