@@ -600,7 +600,7 @@ class UserSocialAccount(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'user_socialaccount'
+        db_table = 'USER_SOCIALACCOUNT'
         unique_together = (('provider', 'uid'),)
 
 
