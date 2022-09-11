@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <script src="{% static 'js/posting_register.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/posting_register.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/star-rating-svg.css' %}"/>
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="{% static 'plugins/editor/jquery-te-1.4.0.css' %}"
+    />
+
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="{% static 'plugins/drop/imageuploadify.min.css' %}"
+    />
+    <div class="page-wraper">
+        <div class="page-content bg-white">
+            <!----------상단 제목부분----------->
+            <!--제목을 감싸는 배경-->
+            <div class="dlab-bnr-inr dlab-bnr-inr-sm overlay-black-middle"
+                 style=" background-image: url('{% static 'images/board_name_img.jpg' %}'); height: 350px">
+                <!--상단 제목부분을 누르면 해당 게시판 목록으로 이동-->
+                <a href="{% url 'member_delete_list' %}">
+                    <div class="container clearfix">
+                        <div class="dlab-bnr-inr-entry">
+                            <!--제목-->
+                            <h1 class="text-white introduce-letter-spacing_5">제명 안건 게시판</h1>
+                            <!--부제목-->
+                            <p class="m-t20">제명 안건과 관련된 게시판입니다.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!--===============================================입력란=========================================================-->
+            {% load widget_tweaks %}
+            <form action="
+                    {% if is_update %}{% url 'member_delete_update' user_delete_no=user_delete_no %}{% else %}{% url 'member_delete_register' deleted_user=0 %}{% endif %}"
+                  class="add-listing-form" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% for field in user_delete_form.hidden_fields %}
+                    {{ field }}
+                {% endfor %}
+                <input type="hidden" name="is_register" value="0"/>
+                <div class="content-block">
+                    <div class="section-full content-inner bg-white">
+                        <div class="container">
+                            <form class="add-listing-form">
+                                <!--=====================-->
+                                <div class="content-box editor">
+                                    <!--글쓰기-->
+                                    <div class="content-header">
+                                        <h3 class="title">제명 안건 작성</h3>
+                                    </div>
+                                    <div class="content-body">
+                                        <!--제목 입력란-->
+                                        <div class="form-group">
+
+                                            {% render_field user_delete_form.user_delete_title class="form-control" style="font-size: 25px; height: 70px;" %}
+                                            <!--이미지, 파일 업로드란-->
+                                            <div class="form-group">
+                                                {{ user_delete_file_form.upload_file }}
+                                            </div>
+                                        </div>
+                                        <!-- 이미 존재하고 있던 이미지: 삭제 가능 (수정모드)-->
+                                        {% if is_update %}
+                                            {% include "file_update_box.html" with file_list=user_delete_file_list %}
+                                        {% endif %}
+                                        <!--내용입력란-->
+                                        <div class="form-group">
+                                            {% render_field user_delete_form.user_delete_content %}
+                                            <!--input-->
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--=====================-->
+                                <!--등록하기 버튼, 누르면 게시글 상세보기로-->
+                                <!--최초 글작성 시 나오는 버튼-->
+                                <div style="display: grid; justify-items: center">
+                                    <button class="site-button btn-block button-md" type="submit" style="width: 30%">
+                                        {% if is_update %}
+                                            수정하기
+                                        {% else %}
+                                            등록하기
+                                        {% endif %}
+                                    </button>
+                                </div>
+                            </form>
+                            <!-- Pagination END -->
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% include "file_script.html" %}
+
+
+{% endblock %}
