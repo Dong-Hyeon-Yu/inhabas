@@ -69,6 +69,7 @@
   8. `on-premise` 에서 `aws` 로 전환, savings_plan 적용하여 비용 절약
   9. 게시글 관련 테이블 재설계 [[블로그 글 참고]](https://letsmakemyselfprogrammer.tistory.com/38)
   10. `swagger` 명세 작성.
+  11. 백엔드 팀원 교육 [[교육 자료]](https://letsmakemyselfprogrammer.tistory.com/83)
 #### 장애 대응
   1. `(2022.01.11)` tls 인증서 적용 갑자기 안되는 문제 [[블로그 글]](https://letsmakemyselfprogrammer.tistory.com/48)
   2. `(2022.03.13)` 로그인 관련 오류 [[블로그 글]](https://letsmakemyselfprogrammer.tistory.com/65)
