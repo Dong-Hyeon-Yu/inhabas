@@ -66,7 +66,7 @@
   5. 개발용 원격 db 접속 ssh tunneling 설정.
   6. `spring cloud config` 를 통해서 운영환경별 설정파일 관리.
   7. `github action` 을 통한 배포 자동화.
-  8. `on-premise` 에서 `aws` 로 전환
+  8. `on-premise` 에서 `aws` 로 전환, savings_plan 적용하여 비용 절약
   9. 게시글 관련 테이블 재설계 [[블로그 글 참고]](https://letsmakemyselfprogrammer.tistory.com/38)
   10. `swagger` 명세 작성.
 #### 장애 대응
