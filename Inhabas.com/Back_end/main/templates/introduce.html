@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/ibas_contents.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/nav.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/size.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/media.css' %}">
+    <script src="{% static 'js/ibas_centents.js' %}"></script>
+    <script src="{% static 'js/nav.js' %}"></script>
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="{% static 'plugins/editor/jquery-te-1.4.0.css' %}"
+    />
+
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="{% static 'plugins/drop/imageuploadify.min.css' %}"
+    />
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+    </style>
+
+    <script>
+        function intro_show(num) {
+            var img = document.getElementById('introduce-img');
+            var p1 = document.getElementById('introduce-p1');
+            var p2 = document.getElementById('introduce-p2');
+            for (i = 1; i < 4; i++) {
+                var intro_p = document.getElementById('intro-p-' + num);
+                document.getElementById('intro-p-' + i).style.color = 'grey';
+            }
+
+            intro_p.style.color = 'white'
+
+            p1.innerHTML = ' ';
+            p1.className = 'dis-none-media';
+
+            p2.className = 'intro-job-font media-mr-30px';
+            p2.style.lineHeight = '200%'
+            p2.style.color = 'white'
+            p2.style.fontWeight = 'bold'
+
+            if (num === 1) {
+                img.src = '{% static "images/data-an.png" %}';
+                p2.innerHTML = '다양한 분야의 지식을 기반으로 다방면의 데이터를 끌어모아 비즈니스 인사이트를 도출하는 역할을 합니다.' +
+                    '<br>이를 위해 머신러닝 모델링 보다는 SQL을 활용해 데이터를 추출&분석 후 ' +
+                    '<br class="dis-none-media" >Tableau등을 통해 시각화 하고 분석보고서를 만드는 작업을 합니다. '
+
+
+            } else if (num === 2) {
+                img.src = '{% static "images/data-eng.png" %}'
+                p2.innerHTML = '데이터 분석을 효과적으로 수행하기 위해서는 방대한 데이터를 안전하고 효과적으로 저장하며 <br>' +
+                    '필요시 빠르게 불러낼 수 있는 시스템을 구축해야합니다. 이를 위해 프로그래밍을 이용해<br>' +
+                    ' 시스템을 구축하는 역할을 하며 특성상 진로를 Developer로 택한 이들이 많습니다.'
+
+            } else if (num === 3) {
+                img.src = '{% static "images/data-sc.png" %}'
+                p2.innerHTML = '머신러닝,파이썬,통계 등의 다양한 방법을 활용해 대량의 데이터에서 인사이트를 뽑아낼 수 있는 사람을 의미합니다.' +
+                    '<br>비즈니스에 여러 알고리즘을 적용,특정 업무에 맞는 모델링을 구현합니다. ' +
+                    '<br>새로운 분석 모델이나 머신러닝 모델을 수정 혹은 개발하는 역할을 합니다.'
+
+            }
+        }
+
+        function intro_hide() {
+            var img = document.getElementById('introduce-img');
+            var p1 = document.getElementById('introduce-p1');
+            var p2 = document.getElementById('introduce-p2');
+
+
+            img.src = '{% static "images/data-bg.jpg" %}'
+            p1.innerHTML = 'Big Data';
+            p2.innerHTML = 'Career';
+
+            p2.style.fontSize = '80pt'
+            p2.style.lineHeight = '120px'
+
+
+        }
+
+    </script>
+
+    <!--제목을 감싸는 배경-->
+    <div class="dlab-bnr-inr dlab-bnr-inr-sm overlay-black-middle"
+         style=" background-image: url('{% static 'images/board_name_img.jpg' %}'); height: 74px; z-index: 0">
+    </div>
+
+    <!-- 빅데이터 설명 -->
+    <section class="introduce">
+        <img src="{% static 'images/bigdata-bg.png' %}" class="relative w-100 h-100" style="object-fit: cover">
+        <div class="absolute intro-bigdata" style="">
+            <p class="text-white animate__animated animate__fadeInUp m-b100 font-weight-500 media-mb-50 bigdata-font"
+               style="line-height: 110px">Big Data</p>
+            <p class="text-white animate__animated animate__fadeInUp font-weight-400 intro-bigdata-font media-mr-30p"
+               style="line-height: 35px">빅데이터란 디지털 환경에서 생성되는 데이터로
+                <br class="dis-none-media">그 규모가 방대하고, 생성 주기도 짧고, 형태도 수치 데이터뿐 아니라
+                <br class="dis-none-media">문자와 영상 데이터를 포함하는 대규모 데이터를 말합니다.
+                <br> 빅데이터는 과거에 비해 데이터가 폭증하였고
+                <br class="dis-none-media">데이터의 종류도 다양해져 사람들의 행동은 물론이고
+                <br class="dis-none-media">위치정보와 SNS를 통해 생각과 의견까지 분석하고 예측할 수 있습니다. </p>
+        </div>
+    </section>
+
+    <!-- 진로 설명 -->
+    <section id="introduce-career" class="introduce bg-black-light">
+        <img id="introduce-img" src="{% static 'images/career-bg.png' %}"
+             class="absolute introduce" style="filter: brightness(25%); object-fit: cover">
+        <div class="m-l30 absolute z-index100 intro-career">
+            <p id="introduce-p1" class="text-gray-1 font-weight-600 z-index100 ca-bigdata-font">Big
+                Data</p>
+            <p id="introduce-p2" class="text-white font-weight-600 m-0 z-index100 ca-career-font"
+               style="line-height: 80px;">
+                Career</p>
+        </div>
+
+        <div class="d-flex flex-column absolute intro-job r-30px">
+            <p id="intro-p-1"
+               class="font-weight-600 text-right m-b50 introduce-v4 z-index100 introduce-pointer introduce-career"
+               style="color: grey; line-height: 60px" onclick="intro_show(1)">Data<br class="dis-none">
+                Analyst</p>
+            <p id="intro-p-2"
+               class="font-weight-600 text-right m-b50 introduce-v4 z-index100 introduce-pointer introduce-career"
+               style="color: grey; line-height: 60px" onclick="intro_show(2)">Data<br class="dis-none">
+                Engineer</p>
+            <p id="intro-p-3"
+               class="font-weight-600 text-right m-b50 introduce-v4 z-index100 introduce-pointer introduce-career"
+               style="color: grey; line-height: 60px" onclick="intro_show(3)">Data<br class="dis-none">
+                Scientist</p>
+
+            {#                <p class="text-white font-weight-600 m-0" style="font-size: 80pt; line-height: 120px;">Velocity</p>#}
+        </div>
+    </section>
+
+    <!-- 동아리 연혁  -->
+    <section id="introduce-career" class="introduce bg-black-light">
+        <img class="absolute" src="{% static 'images/history-bg.jpg' %}" style="width: inherit; height: inherit; object-fit: cover">
+
+        <div id="timeline-content" class="relative text-center">
+
+            <p class="text-left p-l50 p-t60 text-white font-weight-500 history-font"
+               style="letter-spacing: 1.5px; line-height: 50px">
+                HISTORY <br>
+                {% if is_superuser %}
+                    <span class="p-l30 text-white introduce-pointer introduce-history-add" onclick="introduce_add()">동아리 연혁 추가하기</span>
+                {% endif %}
+            </p>
+
+            <!-- ===================================모달부분======================================== -->
+            <!--introduce-modal-bg는 yejin.css에 정의되어 있음. -->
+            <div id="introduce-modal-bg" class="introduce-modal-bg" tabindex="-1">
+                <!--introduce-modal는 yejin.css에 정의되어 있음. -->
+                <div class="introduce-modal">
+                    <div class="content-box">
+                        {% if is_superuser %}
+                            <div class="content-header">
+                                <h3 class="title"><i class="la la-map-signs m-r5"
+                                                     style="color: #091069; font-size: 16pt">
+                                </i>동아리 연혁 추가하기</h3>
+                            </div>
+                            <form action="{% url 'history_register' %}" method="post">
+                                {% csrf_token %}
+                                <div class="content-body">
+                                    <ul class="icon-box-list">
+                                        <!--요소 간 간격을 조절하기 위해서 그리드로 짜줌. 바로 밑 형제요소와 사이즈 다르니 주의 요망 -->
+                                        <li style="width: 100%; display: grid; grid-template-columns: 50px 170px">
+                                            <div class="icon-cell bg-gray">
+                                                <i class="la la-calendar" style="justify-content: center"></i>
+                                            </div>
+
+                                            <!--introduce-li-flex introduce-border_none는 yejin.css에 정의되어 있음. -->
+                                            <div class="introduce-li-flex">
+                                                <input type="date" name="history_date"
+                                                       class="introduce-border_none" style="font-size: 20px"/>
+                                            </div>
+                                        </li>
+                                        <!--요소 간 간격을 조절하기 위해서 그리드로 짜줌. 바로 위 형제요소와 사이즈 다르니 주의 요망 -->
+                                        <li class="w-100" style="display: grid; grid-template-columns:50px 307px">
+                                            <div class="icon-cell bg-gray">
+                                                <i class="la la-pencil"></i>
+                                            </div>
+
+                                            <!--연혁 입력-->
+                                            <div class="introduce-li-flex">
+                                                <textarea name="history_title"
+                                                          type="text"
+                                                          class="form-control"
+                                                          style="resize: none; font-size: 20px"
+                                                          placeholder="제목을 입력하세요."></textarea>
+                                            </div>
+                                            <!--칸 맞춰주기 위한 div-->
+                                            <div></div>
+
+                                            <!--연혁 설명 입력-->
+                                            <div class="introduce-li-flex m-t15">
+                                                <textarea name="history_cont"
+                                                          type="text"
+                                                          class="form-control"
+                                                          style=" font-size: 20px"
+                                                          placeholder="설명을 입력하세요."></textarea>
+                                            </div>
+
+                                        </li>
+                                    </ul>
+                                    <p class="font-12 text-red">해당 란을 입력하지 않을 시, 제목과 똑같이 처리합니다.</p>
+                                </div>
+                                <div class="content-footer">
+                                    <input type="submit" class="btn btn-primary"
+                                           style="background-color: #091069"
+                                           value="등록"/>
+                                    <!-- introduce_close()는 yejin.js에 정의되어 있음. 동아리 연혁 추가 모달을 닫기 위한 함수임.  -->
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                            onclick="introduce_close()">Close
+                                    </button>
+                                </div>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <!-- ===================================모달부분 끝======================================== -->
+            <!-- ===================================연혁부분 시작======================================== -->
+
+            <div class="introduce-scroll height-70vh">
+                <ul class="introduce-history media-ml-100">
+                    <!-- 여기부터 복사 -->
+                    <!-- 주의!!!!! 연도 새로 시작할때만 data-date 에 연도 지정해 주어야 함. 최고 중요. 안하면 완전 별로임 -->
+                    <!-- 주의!!!!! 하위 요소의 id는 모두 javascript 함수에 사용되는 것임.  -->
+                    {% for history in history_list %}
+                        <li class="introduce-event"
+                            data-date="{% if history.is_marked %}{{ history.history_date|date:'Y' }}{% endif %}">
+                            <form id="form-history-update-{{ history.history_no }}" action="{% url 'history_update' %}"
+                                  method="post" class="m-b10">
+                                {% csrf_token %}
+                                <input type="hidden" name="history_no" value="{{ history.history_no }}"/>
+                                <input id="history-date-{{ history.history_no }}"
+                                       name="history_title"
+                                       class="font-weight-400 text-white m-b5 d-block height-25 m-b10 w-100 his-title-f"
+                                       style="background-color: rgba(0, 0, 0, 0); border: none"
+                                       value="{{ history.history_title }}"
+                                       disabled="disabled">
+                                <input id="history-txt-{{ history.history_no }}"
+                                       type="text"
+                                       name="history_date"
+                                       class="font-weight-300 text-white m-b5 d-block height-25 his-date-f"
+                                       style="background-color: rgba(0, 0, 0, 0); border: none"
+                                       value="{{ history.history_date|date:"Y-m-d" }}"
+                                       disabled="disabled">
+
+                                    <input id="history-con-{{ history.history_no }}"
+                                           name="history_cont"
+                                           class="font-weight-300 text-white d-block height-30 his-cont-f his-cont-w"
+                                           style="background-color: rgba(0, 0, 0, 0); border: none;"
+                                           {% if history.history_title == history.history_cont %}
+                                               type="hidden"
+                                           {% endif %}
+                                           value="{{ history.history_cont }}"
+                                           disabled="disabled">
+
+                            </form>
+                            <div class="text-right">
+                                {% if is_superuser %}
+                                    <div class="d-inline-block"
+                                         onclick="introduce_update('{{ history.history_no }}')">
+                                        <input id="btn-history-update-{{ history.history_no }}" type="submit"
+                                               hidden/>
+                                        <i id="history-update-{{ history.history_no }}" class="fa fa-pencil"
+                                           style="font-size: 20px"></i>
+                                    </div>
+                                    <form id="form-history-delete-{{ history.history_no }}"
+                                          action="{% url 'history_delete' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="history_no" value="{{ history.history_no }}"/>
+                                        <div class="d-inline-block" onclick="introduce_del('{{ history.history_no }}')">
+                                            <i class="fa fa-trash" id="delete" style="font-size: 20px"></i>
+                                        </div>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                    <!-- 여기까지 복사 -->
+                </ul>
+            </div>
+            <!-- ===================================연혁부분 끝======================================== -->
+        </div>
+    </section>
+
+    <!-- IBAS 소개 -->
+    <section id="introduce-career" class="introduce bg-black-light intro-ibas-h">
+        <!-- 이미지 -->
+        <img src="{% static 'images/ibas_image.jpg' %}"
+             style="height: inherit; filter: brightness(0.5); object-fit: cover"
+             class="d-inline-block absolute intro-ibas-img">
+
+        <!-- IBAS 소개 내용 -->
+        <div class="d-inline-block intro-ibas-pos" style="left: 35vw">
+            <p class="text-left p-l30 p-t60 text-white font-weight-500 intro-ibas-title"
+               style="letter-spacing: 1.5px; line-height: 40px">
+                IBAS
+                <br><span class="text-gray-1" style="font-size: 15px">Inha Bigdata Analyst Society</span>
+            </p>
+
+            <p class="d-inline-block text-white p-l30 text-left m-r50 font-weight-300 intro-ibas-cont"
+               style="line-height: 40px">
+                안녕하세요 인하대학교 빅데이터 학술동아리 IBAS입니다. 반갑습니다.<br>
+                IBAS는 4차산업 혁명 시대의 흐름에 맞추어 필요한 빅데이터 역량을 갖춘 인재를 육성해 나가자는 취지에서
+                <br class="dis-none-media">만들어진 동아리입니다. 주로 데이터 직무(산업)에 관심있는 학생들이 모여 빅데이터 분석에 필요한 지식을
+                <br class="dis-none-media">습득, 활용해 나가며 빅데이터 역량을 갖추고 사회에 나갈 수 있도록 학습하는 빅데이터 학술동아리 입니다.</p>
+        <div class="media-line-ft dis-none"></div>
+            <p class="text-left p-l30 p-t60 p-b30 font-weight-800 text-white intro-staff-f media-pt-16px"
+               style="letter-spacing: 1.5px; line-height: 40px; font-family: 'Nanum Gothic'">
+                운영진
+            </p>
+
+            <!-- IBAS 운영진 소개 -->
+            <div class="introduce-scroll intro-staff-w" style="height: 30vh">
+                <div class="comments-area" id="comments">
+                    <div class="clearfix">
+                        <ol class="comment-list">
+                            <!-- 여기부터 복붙 -->
+                            {% for chief_crew in chief_crews %}
+                                <li class="comment float-left d-flex justify-content-center align-items-center width-200">
+                                    <div class="m-l30">
+                                        <div class="comment-author vcard mb-0 d-flex">
+                                            <div class="m-r20 d-flex flex-column justify-content-center align-items-center">
+                                                <!-- 프로필사진 -->
+                                                <img
+                                                        class="photo max-min-width-height-100 media-max-min-w-h-60 rounded-circle border-3 border-white"
+                                                        src="/media/{{ chief_crew.user_pic }}"
+                                                        alt="현재 브라우저에서 지원하지 않는 형식입니다.">
+
+                                                <!-- 이름, 직책, 전공, 학번 -->
+                                                <div class="p-tb15 d-flex flex-column justify-content-center align-items-center">
+                                                    <cite class="fn text-center"
+                                                          style="color: white;">{{ chief_crew.user_name }}
+                                                        <span class="text-white font-weight-400"
+                                                              style="font-size: 12px; letter-spacing: 2px; line-height: 24px;">
+                                                                    ({{ chief_crew.user_role.role_name }})</span>
+                                                        <div class="comment-meta font-weight-400">
+                                                            <div class="text-white font-weight-400"
+                                                                 style="font-size: 12px">
+                                                                {{ chief_crew.user_major.major_name }} {{ chief_crew.user_stu|stringformat:"s"|slice:"2:4" }}학번
+                                                            </div>
+                                                            <!-- 원래는 이메일 나타냈으나, 지웠음.
+                                                            <p class="text-white font-weight-500 text-lowercase">
+                                                                {# {{ chief_crew.useremail_set.first.user_email }} #}</p>-->
+                                                        </div>
+                                                    </cite>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                            <!-- 여기까지 복붙 -->
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </section>
+
+
+{% endblock %}
+

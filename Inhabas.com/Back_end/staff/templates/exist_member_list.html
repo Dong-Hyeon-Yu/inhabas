@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% load table_tags %}
+{% load static %}
+{% block content %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/ibas_contents.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/size.css' %}">
+    <script src="{% static 'js/ibas_centents.js' %}"></script>
+    <script src="{% static 'js/form.js' %}"></script>
+    <script>
+        function selectAoR() {
+            itemidSelect = document.getElementById('select-aor');
+            document.getElementById("input-aor").value = itemidSelect.options[itemidSelect.selectedIndex].value;
+        }
+
+        function decideChk(obj, user_stu) {
+            if (obj.checked === true) {
+                document.getElementById('new-user-check-' + user_stu).checked = true;
+            } else {
+                document.getElementById('new-user-check-' + user_stu).checked = false;
+            }
+        }
+
+    </script>
+
+    <style>
+        /* 페이지네이션 클릭 시 색 관련 css*/
+        .page-item.active .page-link {
+            z-index: 1;
+            color: #fff;
+            background-color: #4611a7;
+            border-color: #4611a7;
+        }
+
+    </style>
+
+    <div class="page-wraper">
+        <!-- 상단 제목부분 -->
+        <div class="page-content bg-white">
+            <!----------============= 상단 제목 시작 ================----------->
+            <!--제목을 감싸는 배경-->
+            <div class="dlab-bnr-inr dlab-bnr-inr-sm overlay-black-middle"
+                 style=" background-image: url('{% static 'images/board_name_img.jpg' %}'); height: 350px">
+                <!-- 상단 제목을 클릭하면, 상위 게시판으로 이동 -->
+                <!-- (ex.자유게시판의 '용식이의 학식일기'글의 상세 페이지에서 상위 제목을 클릭하면, 자유게시판으로 이동) -->
+                <a href="{% url 'member_delete_list' %}">
+                    <div class="container clearfix">
+                        <div class="dlab-bnr-inr-entry">
+                            <!--제목-->
+                            <!-- DB에서 제목 꺼내와야 함 -->
+                            <h1 class="text-white introduce-letter-spacing_5">동아리원 현황</h1>
+                            <!--부제목-->
+                            <!-- DB에서 제목 꺼내와야 함 -->
+                            <p class="m-t20">동아리원 관리 게시판입니다.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!----------============= 본문 시작 ================----------->
+            <div class="content-block">
+                <div class="section-full content-inner bg-white">
+                    <div class="container">
+                        {% if logined_user.user_role.role_no <= 4 %}
+                            <!-- 회원 관리 콘텐츠 시작 -->
+                            <div class="content-box">
+                                <div class="content-header d-flex justify-content-between">
+                                    <h3 class="title"><i class="la la-tasks m-r5"></i>동아리원 현황&nbsp;
+                                        <span class="font-12 text-red">({{ total_exist_users }})</span></h3></h3>
+                                    <a href="{% url 'staff_member_list' %}" class="font-12">목록으로</a>
+                                </div>
+                                <!-- 동아리원현황 관리 콘텐츠 시작 -->
+
+                                <div class="content-body">
+                                    <div class="myinfo-table-padding">
+                                        <form action="{% url 'staff_member_update' %}" method="post">
+                                            {% csrf_token %}
+                                            <!-- staff_mem_select는 staff_cr.css에 정의되어 있음.  -->
+                                            {% if logined_user.user_role.role_no == 4 %}
+                                                <div class="staff_mem_select m-b20">
+                                                    <select name="user_auth">
+                                                        <option selected="selected" disabled="disabled">권한
+                                                            부여
+                                                        </option>
+                                                        {% for auth in auth_list %}
+                                                            <option name="user_auth"
+                                                                    value="{{ auth.auth_no }}">{{ auth.auth_name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            {% endif %}
+                                            <!-- staff_mem_select는 staff_cr.css에 정의되어 있음.  -->
+                                            {% if logined_user.user_role.role_no <= 2 %}
+                                                <div class="staff_mem_select m-b20">
+                                                    <select name="user_role">
+                                                        <option selected="selected" disabled="disabled">역할
+                                                            부여
+                                                        </option>
+                                                        {% if role_list %}
+                                                            {% for role in role_list %}
+                                                                <option name="user_role"
+                                                                        value="{{ role.role_no }}">{{ role.role_name }}</option>
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    </select>
+
+                                                </div>
+                                            {% endif %}
+                                            <!-- staff_mem_btn는 staff_cr.css에 정의되어 있음.  -->
+                                            {% if logined_user.user_role.role_no <= 2 or logined_user.user_role.role_no == 4 %}
+                                                <div class="staff_mem_btn m-b20 listing-info-right">
+                                                    <!-- &nbsp;는 띄어쓰기 -->
+                                                    <button class="site-button" type="submit"><i
+                                                            class="la la-check m-r5"
+                                                            style="font-weight: bold"></i>&nbsp;적용
+                                                    </button>
+                                                </div>
+                                            {% endif %}
+                                            <!-- 동아리원 관리 테이블 -->
+                                            <table class="table">
+                                                <!-- 테이블 1행: 제목 -->
+                                                <thead>
+                                                <tr>
+                                                    <!-- staff_width는 staff_cr.css에 정의되어 있음.  -->
+                                                    <th class="border-top-0 width-50 min-width-50"></th>
+                                                    <th class="border-top-0 width-50 min-width-50"
+                                                        scope="col"></th>
+                                                    <th class="border-top-0 width-100 min-width-100 text-center"
+                                                        scope="col">
+                                                        이름
+                                                    </th>
+                                                    <th class="border-top-0 width-150 min-width-150 text-center"
+                                                        scope="col">
+                                                        학번
+                                                    </th>
+                                                    <th class="border-top-0" scope="col">학과</th>
+                                                    <th class="border-top-0 width-170 min-width-170 text-center"
+                                                        scope="col">
+                                                        권한
+                                                    </th>
+                                                    <th class="border-top-0 width-170 min-width-170 text-center"
+                                                        scope="col">
+                                                        역할
+                                                    </th>
+                                                    <th class="border-top-0 width-100 min-width-100 text-center"
+                                                        scope="col">
+                                                        기수
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <!-- 댓글 내용 테이블 -->
+                                                <tbody>
+
+                                                {% if exist_user_list|length == 0 %}
+                                                    <td colspan="8" style="text-align: center">회원 리스트에 회원이
+                                                        존재하지 않습니다.
+                                                    </td>
+                                                {% endif %}
+                                                {% for exist_user in exist_user_list %}
+                                                    <tr>
+                                                        <td scope="row">
+                                                            {% if logined_user.user_role_id != 3 and exist_user.user_role_id != 5 %}
+                                                                <div class="input-block">
+                                                                    <input id="check_{{ exist_user.user_stu }}"
+                                                                           type="checkbox"
+                                                                           name="user_stu_list[]"
+                                                                           value="{{ exist_user.user_stu }}">
+                                                                    <!-- staff_label_margin는 staff_cr.css에 정의되어 있음.  -->
+                                                                    <label for="check_{{ exist_user.user_stu }}"
+                                                                           class="staff_label_margin"></label>
+                                                                </div>
+                                                            {% endif %}
+                                                        </td>
+                                                        <th>{% table_row_index exist_user_list forloop.counter0 %}</th>
+                                                        <!-- 회원 이름 -->
+                                                        <td class="text-center">{{ exist_user.user_name }}</td>
+                                                        <!-- 회원 학번 -->
+                                                        <td class="text-center">{{ exist_user.user_stu }}</td>
+                                                        <!-- 회원 학과 -->
+                                                        <td>{{ exist_user.user_major.major_name }}</td>
+                                                        <!-- 권한 상태 -->
+                                                        <td class="text-center">
+                                                            {{ exist_user.user_auth.auth_name }}
+                                                        </td>
+                                                        <!-- 역할 상태 -->
+                                                        <td class="text-center">
+                                                            {{ exist_user.user_role.role_name }}
+                                                        </td>
+{#                                                        <!-- 제명건의 -->#}
+{#                                                        <td class="text-center">#}
+{#                                                            {% if exist_user.user_role.role_no != 5 %}#}
+{#                                                                {% if exist_user.is_going_to_delete %}#}
+{#                                                                    <a class="m-0"#}
+{#                                                                       href="{% url "member_delete_detail" user_delete_no=exist_user.delete_no %}"#}
+{#                                                                       style="font-size: 12px; font-weight: bold; color: #dc3545 "#}
+{#                                                                    >제명진행중</a>#}
+{#                                                                {% else %}#}
+{#                                                                    <a href="{% url "member_delete_register" deleted_user=exist_user.user_stu %}"#}
+{#                                                                       style="font-size: 12px; font-weight: bold">제명건의</a>#}
+{#                                                                {% endif %}#}
+{#                                                            {% endif %}#}
+{#                                                        </td>#}
+                                                        <td class="text-center">
+                                                            {{ exist_user.user_gen }}기
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+
+                                        </form>
+                                        <!-- 검색창 시작 -->
+                                        <form action="" method="get">
+                                            <div class="input-group d-flex justify-content-end m-t30 m-b30">
+                                                <!-- 검색창 div -->
+                                                <div class="lect-search-bar d-flex width-310">
+                                                    <!-- 검색창 input 태그 -->
+
+                                                    <input name="keyword" type="text" class="form-control"
+                                                           placeholder="이름/학번을 입력하세요.">
+                                                    <span class="input-group-btn ">
+                                                        <!-- 검색버튼 -->
+                                                        <button type="submit" class="site-button">
+                                                            <i class="fa fa-search"></i>
+                                                        </button>
+                                                    </span>
+
+                                                </div>
+                                            </div>
+                                        </form>
+                                        <!-- 검색창 끝 -->
+
+                                        {% if exist_user_list %}
+                                            {% include "_pagination.html" with page_name="exist_user_page" item_list=exist_user_list%}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 상단으로 한번에 올라가는 버튼 -->
+        <button class="scroltop fa fa-chevron-up" style="display: none;"></button>
+    </div>
+{% endblock %}

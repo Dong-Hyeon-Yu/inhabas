@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% load table_tags %}
+{% load static %}
+{% block content %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/ibas_contents.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/size.css' %}">
+    <script src="{% static 'js/ibas_centents.js' %}"></script>
+    <script src="{% static 'js/form.js' %}"></script>
+    <script>
+        function selectAoR() {
+            itemidSelect = document.getElementById('select-aor');
+            document.getElementById("input-aor").value = itemidSelect.options[itemidSelect.selectedIndex].value;
+        }
+
+        function decideChk(obj, user_stu) {
+            if (obj.checked === true) {
+                document.getElementById('new-user-check-' + user_stu).checked = true;
+            } else {
+                document.getElementById('new-user-check-' + user_stu).checked = false;
+            }
+        }
+
+        function submitForm(id) {
+            const loadingObj = document.createElement("div");
+            loadingObj.id = "loading-area"
+            document.body.appendChild(loadingObj)
+            document.getElementById(id).submit();
+        }
+    </script>
+
+    <style>
+        /* 페이지네이션 클릭 시 색 관련 css*/
+        .page-item.active .page-link {
+            z-index: 1;
+            color: #fff;
+            background-color: #4611a7;
+            border-color: #4611a7;
+        }
+
+    </style>
+    <div class="page-wraper">
+        <!-- 상단 제목부분 -->
+        <div class="page-content bg-white">
+            <!----------============= 상단 제목 시작 ================----------->
+            <!--제목을 감싸는 배경-->
+            <div class="dlab-bnr-inr dlab-bnr-inr-sm overlay-black-middle"
+                 style=" background-image: url('{% static 'images/board_name_img.jpg' %}'); height: 350px">
+
+                <a href="{% url 'member_delete_list' %}">
+                    <div class="container clearfix">
+                        <div class="dlab-bnr-inr-entry">
+
+                            <h1 class="text-white introduce-letter-spacing_5">신규회원 관리 게시판</h1>
+
+                            <p class="m-t20">신규회원과 관련한 게시판입니다.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!----------============= 본문 시작 ================----------->
+            <div class="content-block">
+                <div class="section-full content-inner bg-white">
+                    <div class="container">
+
+                        <!--회원관리-->
+                        {% if logined_user.user_role_id != 4 %}
+                            <div class="content-box">
+                                <!-- 제목 div -->
+                                <div class="content-header d-flex justify-content-between">
+                                    <h3 class="title"><i class="la la-users m-r5"></i>신입부원 관리&nbsp;
+                                        <span class="font-12 text-red">({{ total_new_users }})</span></h3>
+                                    {% if new_user_list %}<a href="{% url 'staff_member_list' %}" class="font-12">목록으로</a>{% endif %}
+                                </div>
+                                <!-- 신입부원 관리 콘텐츠 시작 -->
+                                <div class="content-body">
+                                    <div class="myinfo-table-padding">
+                                        <!-- 신입부원 관리 테이블 시작 -->
+                                        <!-- staff_mem_select는 staff_cr.css에 정의되어 있음.  -->
+                                        {#                                        <div class="staff_mem_select m-b20">#}
+                                        {#                                            <!-- onchange 는 필터. staff.js 에 정의되어 있음. -->#}
+                                        {#                                            <select id="staff_select_grade" name=""#}
+                                        {#                                                    onchange="staff_grade()">#}
+                                        {#                                                <option selected="selected">학년#}
+                                        {#                                                </option>#}
+                                        {#                                                {% for grade in grade_list %}#}
+                                        {#                                                    <option>{{ grade }}학년</option>#}
+                                        {#                                                {% endfor %}#}
+                                        {#                                            </select>#}
+                                        {#                                        </div>#}
+
+                                        <!-- staff_mem_select는 staff_cr.css에 정의되어 있음.  -->
+                                        <div class="staff_mem_select m-b20">
+                                            <select id="select-aor" onchange="selectAoR()">
+                                                <option selected="selected" disabled="disabled">승인 여부
+                                                </option>
+                                                <option value="1">합격</option>
+                                                <option value="2">불합격</option>
+                                            </select>
+                                        </div>
+                                        <!-- staff_mem_btn는 staff_cr.css에 정의되어 있음.  -->
+                                        <div class="staff_mem_btn m-b20 listing-info-right">
+                                            <!-- &nbsp;는 띄어쓰기 -->
+                                            <button class="site-button" type="button"
+                                                    onclick="submitForm('hd-form-members-aor')">
+                                                <i
+                                                        class="la la-check m-r5"
+                                                        style="font-weight: bold"
+                                                ></i>&nbsp;적용
+                                            </button>
+                                        </div>
+
+                                        <form id="hd-form-members-aor" action="{% url 'members_aor' %}"
+                                              method="post" style="display: none">
+                                            {% csrf_token %}
+                                            {% for new_user in new_user_list %}
+                                                <input id="new-user-check-{{ new_user.user_stu }}"
+                                                       type="checkbox" name="user_stu_list[]"
+                                                       value="{{ new_user.user_stu }}"
+                                                       style="display: none"/>
+                                            {% endfor %}
+                                            <input id="input-aor" type="hidden" name="aor" value="0"/>
+                                        </form>
+
+                                        <table class="table">
+                                            <thead>
+                                            <!-- 테이블 1행: 제목 -->
+                                            <tr id="staff_new_head">
+                                                <!-- staff_width는 staff_cr.css에 정의되어 있음.  -->
+                                                <th class="border-top-0 width-50 min-width-50"
+                                                    scope="col"></th>
+                                                <th class="border-top-0 width-50 min-width-50"
+                                                    scope="col"></th>
+                                                <th class="border-top-0 width-100 min-width-100 text-center"
+                                                    scope="col">이름
+                                                </th>
+                                                <th class="border-top-0 width-70 min-width-70 text-center"
+                                                    scope="col">학년
+                                                </th>
+                                                <th class="border-top-0 width-150 min-width-150 text-center"
+                                                    scope="col">학번
+                                                </th>
+                                                <th class="border-top-0 width-170 min-width-170 text-center"
+                                                    scope="col">전화번호
+                                                </th>
+                                                <th class="border-top-0 width-310 min-width-310"
+                                                    scope="col">학과
+                                                </th>
+                                                <th class="border-top-0 text-center" scope="col">지원서 보기</th>
+                                            </tr>
+                                            </thead>
+                                            <!-- 신입부원 관리 테이블 내용 시작 -->
+                                            <tbody>
+                                            <!-- =========================== 여기부터 복붙 ============================== -->
+                                            {% if new_user_list|length == 0 %}
+                                                <tr>
+                                                    <td colspan="8" style="text-align: center"> 입부 신청 대기중인
+                                                        회원이
+                                                        없습니다.
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+
+                                            {% for new_user in new_user_list %}
+                                                <tr class="staff_new_tr">
+                                                    <td scope="row">
+
+                                                        {% csrf_token %}
+                                                        <div class="input-block">
+                                                            <input id="check_{{ new_user.user_stu }}"
+                                                                   type="checkbox"
+                                                                   onclick="decideChk(this,'{{ new_user.user_stu }}')">
+                                                            <!-- staff_label_margin는 staff_cr.css에 정의되어 있음.  -->
+                                                            <label for="check_{{ new_user.user_stu }}"
+                                                                   class="staff_label_margin"></label>
+                                                        </div>
+
+                                                    </td>
+                                                    <th class="text-center">{% table_row_index new_user_list forloop.counter0 %}</th>
+                                                    <!-- 회원 이름 -->
+                                                    <td class="text-center">{{ new_user.user_name }}</td>
+                                                    <!-- 회원 학년 -->
+                                                    <td class="mem_grade text-center">
+                                                        {% if new_user.user_grade != 5 %}{{ new_user.user_grade }}
+                                                            학년{% else %}교수{% endif %}</td>
+                                                    <!-- 회원 학번 -->
+                                                    <td class="text-center">{{ new_user.user_stu }}</td>
+                                                    <!-- 회원 전화번호 -->
+                                                    <td class="text-center">{{ new_user.user_phone }}</td>
+                                                    <!-- 회원 학과 -->
+                                                    <td>{{ new_user.user_major.major_name }}</td>
+                                                    <!-- 지원서보기 -->
+                                                    <td class="text-center">
+                                                        <a href="#"
+                                                           onclick="submitForm('new_user_application_{{ new_user.user_stu }}')">
+                                                            지원서보기 ▶
+                                                        </a>
+                                                        <form id="new_user_application_{{ new_user.user_stu }}"
+                                                              action="{% url 'member_applications' %}"
+                                                              method="post"
+                                                              style="display: none">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" name="user_stu"
+                                                                   value="{{ new_user.user_stu }}">
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+
+                                        <!-- 검색창 시작 -->
+                                        <form action="" method="get">
+                                            <div class="input-group d-flex justify-content-end m-t30 m-b30">
+                                                <!-- 검색창 div -->
+                                                <div class="lect-search-bar d-flex width-310">
+                                                    <!-- 검색창 input 태그 -->
+
+                                                    <input name="keyword" type="text" class="form-control"
+                                                           placeholder="이름/학번을 입력하세요.">
+                                                    <span class="input-group-btn ">
+                                                        <!-- 검색버튼 -->
+                                                        <button type="submit" class="site-button">
+                                                            <i class="fa fa-search"></i>
+                                                        </button>
+                                                    </span>
+
+                                                </div>
+                                            </div>
+                                        </form>
+                                        <!-- 검색창 끝 -->
+
+                                        {% if new_user_list|length != 0 %}
+                                            {% include "_pagination.html" with item_list=new_user_list page_name="new_user_page" %}
+                                        {% endif %}
+
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 상단으로 한번에 올라가는 버튼 -->
+        <button class="scroltop fa fa-chevron-up" style="display: none;"></button>
+    </div>
+{% endblock %}
