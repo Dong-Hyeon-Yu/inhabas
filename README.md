@@ -48,7 +48,7 @@
   
 ## :airplane: 3. Spring Rest Server 개발
 ### 개발기간
-  : 2021.01.01 ~ 2021.08.09
+  : 2022.01.01 ~ 2022.08.09
 ### github
   : https://github.com/InhaBas/Inhabas.com-api
 ### 기술 스택
