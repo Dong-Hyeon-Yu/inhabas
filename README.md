@@ -63,7 +63,7 @@
   2. 모든 `usecase(serivce)` 와 `api endpoint(controller)` 에 대한 테스트 코드 작성
   3. 인증 모듈 개발(Oauth2.0 구글, 네이버, 카카오 + JWT 토큰) [(SpringSecurity 공부 글)](https://github.com/InhaBas/Inhabas.com-api/issues/3), [(완성된 인증 모듈 docs)](https://letsmakemyselfprogrammer.tistory.com/121)
   4. spring security 인가 관련 테스트 코드 작성 (spring security context 테스트용 모킹 어노테이션 등)
-  5. 개발용 원격 db 접속 ssh tunneling 설정.
+  5. 개발용 원격 db 접속 ssh tunneling 설정. [[블로그 글 참고]](https://letsmakemyselfprogrammer.tistory.com/123)
   6. `spring cloud config` 를 통해서 운영환경별 설정파일 관리.
   7. `github action` 을 통한 배포 자동화.
   8. `on-premise` 에서 `aws` 로 전환, savings_plan 적용하여 비용 절약
